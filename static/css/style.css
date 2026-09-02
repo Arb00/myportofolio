@@ -1,192 +1,459 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* ==========================================================================
+   Muhammad Sabri — Portfolio
+   Tema: Sunset di atas Laut (deep navy → twilight → coral/amber → deep teal)
+   Font display "Space Grotesk" sudah dimuat lewat <link> di HTML.
+   Font body "Lora" (serif hangat) dimuat di sini agar kontras dengan
+   Space Grotesk yang geometris — memberi kesan jurnal/logbook pelaut.
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&display=swap");
+
+/* -------------------------------- Tokens -------------------------------- */
+:root {
+  --void: #0b1220;        /* langit malam, puncak gradient */
+  --dusk: #2b3a67;        /* senja biru-ungu */
+  --coral: #e8734a;       /* jingga matahari terbenam */
+  --amber: #f4b860;       /* keemasan di garis horizon */
+  --tide-deep: #103a4d;   /* laut dalam, ombak lapis belakang */
+  --tide: #1f6e73;        /* laut, ombak lapis depan */
+  --foam: #f7efe3;        /* busa ombak / warna teks utama */
+  --sand: #cdbca3;        /* pasir pudar / teks sekunder */
+
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "Lora", Georgia, serif;
+
+  --container: 1160px;
+  --header-h: 4.75rem;
 }
 
-:root {
-    --ink: #1c1917;
-    --paper: #faf6f0;
-    --accent: #d95d39;
-    --accent-dark: #a8442a;
-    --line: #e3d9c9;
-    --text-muted: #6b6459;
-    --radius: 4px;
+/* -------------------------------- Reset ---------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-    font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: var(--ink);
-    background-color: var(--paper);
-    line-height: 1.6;
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-body);
+  color: var(--foam);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1, .brand {
-    font-family: "Space Grotesk", -apple-system, sans-serif;
+h1,
+p,
+dl,
+dd {
+  margin: 0;
 }
 
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--coral);
+  color: var(--void);
+}
+
+:focus-visible {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ----------------------- Langit & laut (background) ---------------------- */
+/* Gradient statis: malam → senja → jingga → keemasan → laut dalam */
+body {
+  background-image: linear-gradient(
+    180deg,
+    var(--void) 0%,
+    var(--dusk) 36%,
+    var(--coral) 66%,
+    var(--amber) 80%,
+    var(--tide-deep) 100%
+  );
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+/* Dua lapis ombak yang bergerak pelan berlawanan arah — efek air laut
+   yang tenang, dibuat murni dari CSS (SVG sebagai background berulang),
+   tanpa perlu menambah markup baru di HTML. */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-repeat: repeat-x;
+  background-position: bottom left;
+}
+
+/* Lapis belakang: ombak besar & lambat */
+body::before {
+  height: 220px;
+  z-index: -2;
+  opacity: 0.55;
+  background-size: 1200px 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200' preserveAspectRatio='none'%3E%3Cpath d='M0,110 C150,150 350,70 600,110 C850,150 1050,70 1200,110 L1200,200 L0,200 Z' fill='%23103A4D'/%3E%3C/svg%3E");
+  animation: wave-drift-left 55s linear infinite;
+}
+
+/* Lapis depan: ombak lebih kecil & sedikit lebih cepat, arah berlawanan */
+body::after {
+  height: 130px;
+  z-index: -1;
+  opacity: 0.85;
+  background-size: 1200px 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200' preserveAspectRatio='none'%3E%3Cpath d='M0,110 C200,70 400,150 600,110 C800,70 1000,150 1200,110 L1200,200 L0,200 Z' fill='%231F6E73'/%3E%3C/svg%3E");
+  animation: wave-drift-right 32s linear infinite;
+}
+
+@keyframes wave-drift-left {
+  from { background-position-x: 0; }
+  to   { background-position-x: -1200px; }
+}
+
+@keyframes wave-drift-right {
+  from { background-position-x: 0; }
+  to   { background-position-x: 1200px; }
+}
+
+/* --------------------------------- Layout --------------------------------- */
 .container {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
+  width: min(100% - 3rem, var(--container));
+  margin-inline: auto;
 }
+
+/* --------------------------------- Header --------------------------------- */
 .site-header {
-    border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  background: rgba(11, 18, 32, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(247, 239, 227, 0.1);
 }
 
 .site-header .container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .brand {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--ink);
-    text-decoration: none;
-}
-
-.site-header nav {
-    display: flex;
-    gap: 2rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--foam);
 }
 
 .site-header nav a {
-    color: var(--ink);
-    text-decoration: none;
-    font-size: 0.95rem;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  color: var(--sand);
+  position: relative;
+  padding-bottom: 3px;
+  transition: color 0.25s ease;
 }
+
+.site-header nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--amber);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.site-header nav a:hover,
+.site-header nav a:focus-visible {
+  color: var(--foam);
+}
+
+.site-header nav a:hover::after,
+.site-header nav a:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* ---------------------------------- Hero ----------------------------------- */
 .hero {
-    padding: 4.5rem 0 5rem;
+  position: relative;
+  overflow: hidden;
+  min-height: calc(100vh - var(--header-h));
+  display: flex;
+  align-items: center;
+  padding-block: 3.5rem;
+}
+
+/* Cahaya matahari terbenam yang berdenyut sangat pelan di belakang teks */
+.hero::before {
+  content: "";
+  position: absolute;
+  top: -12%;
+  left: 50%;
+  width: 620px;
+  height: 620px;
+  max-width: 90vw;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    circle,
+    rgba(244, 184, 96, 0.5) 0%,
+    rgba(232, 115, 74, 0.25) 45%,
+    transparent 72%
+  );
+  filter: blur(4px);
+  animation: sun-pulse 9s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes sun-pulse {
+  from { opacity: 0.65; transform: translateX(-50%) scale(1); }
+  to   { opacity: 1;    transform: translateX(-50%) scale(1.08); }
 }
 
 .hero-grid {
-    display: grid;
-    grid-template-columns: 1.3fr 1fr;
-    grid-template-areas:
-        "identity photo"
-        "details  photo";
-    gap: 1.5rem 3rem;
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  grid-template-areas:
+    "identity photo"
+    "details  photo";
+  column-gap: 3.5rem;
+  row-gap: 1.5rem;
+  align-items: start;
 }
 
-.hero-identity {
-    grid-area: identity;
-}
-
-.hero-details {
-    grid-area: details;
-}
+.hero-identity { grid-area: identity; }
+.hero-photo    { grid-area: photo; align-self: center; justify-self: center; }
+.hero-details  { grid-area: details; }
 
 .hero-kicker {
-    font-size: 0.85rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--accent-dark);
-    font-weight: 700;
-    margin-bottom: 0.75rem;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--sand);
+  margin-bottom: 0.75rem;
 }
 
 .hero-identity h1 {
-    font-size: clamp(3rem, 7vw, 5rem);
-    line-height: 0.95;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2.75rem, 6vw, 4.5rem);
+  line-height: 1.03;
+  letter-spacing: -0.02em;
+  background: linear-gradient(100deg, var(--coral) 0%, var(--amber) 55%, var(--foam) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
-.bio {
-    color: var(--text-muted);
-    max-width: 480px;
-    margin-bottom: 1.5rem;
+/* Fallback untuk browser tanpa dukungan background-clip: text */
+@supports not (background-clip: text) {
+  .hero-identity h1 {
+    color: var(--foam);
+  }
 }
 
-.meta-list {
-    display: flex;
-    gap: 2rem;
-    margin-bottom: 1.5rem;
-}
-
-.meta-row dt {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-muted);
-    margin-bottom: 0.15rem;
-}
-
-.meta-row dd {
-    font-weight: 600;
-}
-
-.social-links {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.social-link {
-    display: inline-block;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-decoration: none;
-    color: var(--paper);
-    background-color: var(--ink);
-    border-radius: var(--radius);
-    padding: 0.5rem 1.1rem;
-    transition: background-color 0.2s ease;
-}
-
-.social-link:hover {
-    background-color: var(--accent);
-}
-
+/* ------------------------------- Foto profil -------------------------------- */
 .hero-photo {
-    grid-area: photo;
-    align-self: center;
-    position: relative;
+  position: relative;
+  width: min(300px, 78vw);
+}
+
+.hero-photo::after {
+  /* pemisah untuk clip-path avatar */
+  content: none;
 }
 
 .photo-block {
-    position: absolute;
-    top: 1.25rem;
-    left: 1.25rem;
-    width: 100%;
-    height: 100%;
-    background-color: var(--accent);
-    border-radius: var(--radius);
-    z-index: 0;
+  position: absolute;
+  inset: -14px -14px auto auto;
+  top: 18px;
+  left: -16px;
+  width: 100%;
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--coral), var(--amber) 60%, var(--tide));
+  transform: rotate(-4deg);
+  box-shadow: 0 20px 45px rgba(4, 10, 20, 0.4);
 }
 
 .avatar {
-    position: relative;
-    z-index: 1;
-    display: block;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: var(--radius);
-    border: 3px solid var(--ink);
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 6px solid var(--foam);
+  transform: rotate(3deg);
+  box-shadow: 0 22px 48px rgba(4, 10, 20, 0.45);
+  transition: transform 0.4s ease;
 }
+
+.hero-photo:hover .avatar {
+  transform: rotate(0deg);
+}
+
+/* -------------------------------- Detail bio -------------------------------- */
+.bio {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--foam);
+  max-width: 42ch;
+}
+
+.meta-list {
+  margin-block: 1.75rem;
+  border-top: 1px solid rgba(247, 239, 227, 0.15);
+}
+
+.meta-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-block: 0.65rem;
+  border-bottom: 1px solid rgba(247, 239, 227, 0.15);
+}
+
+.meta-row dt {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.9rem;
+  color: var(--sand);
+  flex-shrink: 0;
+}
+
+.meta-row dd {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--foam);
+  text-align: right;
+}
+
+.social-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.75rem;
+  margin-top: 1.5rem;
+}
+
+.social-link {
+  position: relative;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  color: var(--foam);
+  padding-bottom: 4px;
+}
+
+.social-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 1px;
+  background: var(--sand);
+  opacity: 0.5;
+  transition: background 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+  transform-origin: left;
+}
+
+.social-link:hover,
+.social-link:focus-visible {
+  color: var(--amber);
+}
+
+.social-link:hover::after,
+.social-link:focus-visible::after {
+  background: linear-gradient(90deg, var(--coral), var(--amber));
+  opacity: 1;
+  transform: scaleY(2);
+}
+
+/* --------------------------------- Footer ----------------------------------- */
 .site-footer {
-    padding: 1.5rem;
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    border-top: 1px solid var(--line);
+  position: relative;
+  z-index: 1;
+  padding-block: 1.75rem;
+  text-align: center;
+  background: rgba(11, 18, 32, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(247, 239, 227, 0.12);
 }
 
-@media (max-width: 600px) {
-    .hero-grid {
-        grid-template-columns: 1fr;
-        grid-template-areas:
-            "identity"
-            "photo"
-            "details";
-    }
+.site-footer p {
+  font-size: 0.85rem;
+  color: var(--sand);
+}
 
-    .hero-photo {
-        max-width: 220px;
-    }
+/* --------------------------------- Responsif --------------------------------- */
+@media (max-width: 860px) {
+  .hero-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "identity"
+      "photo"
+      "details";
+    row-gap: 2.25rem;
+  }
 
-    .social-links {
-        justify-content: flex-start;
-    }
+  .hero-photo {
+    justify-self: start;
+  }
+
+  body::before { height: 150px; }
+  body::after  { height: 90px; }
+}
+
+@media (max-width: 480px) {
+  .meta-row { flex-direction: column; gap: 0.15rem; }
+  .meta-row dd { text-align: left; }
+}
+
+/* ------------------------------ Aksesibilitas -------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
