@@ -1,61 +1,107 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muhammad Sabri - Portfolio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/static/css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muhammad Sabri — Portofolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-    <header class="site-header">
-        <div class="container">
-            <a href="#profile" class="brand">Sabri</a>
-            <nav>
-                <a href="#profile">Profile</a>
-            </nav>
-        </div>
-    </header>
 
-    <main>
-        <section class="hero" id="profile">
-            <div class="container hero-grid">
-                <div class="hero-identity">
-                    <p class="hero-kicker">Computer Science &middot; Universitas Indonesia</p>
-                    <h1>Muhammad Sabri</h1>
-                </div>
-                <div class="hero-photo">
-                    <div class="photo-block"></div>
-                    <img class="avatar" src="/static/img/sunset.jpeg" alt="Photo of Muhammad Sabri">
-                </div>
-                <div class="hero-details">
-                    <p class="bio">Sophomore CS student at University of Indonesia. Interested in Data Science and Artificial Intelligence. Part of COMPFEST 18</p>
-                    <dl class="meta-list">
-                        <div class="meta-row">
-                            <dt>NPM</dt>
-                            <dd>2506623793</dd>
-                        </div>
-                        <div class="meta-row">
-                            <dt>Program</dt>
-                            <dd>S1 Ilmu Komputer</dd>
-                        </div>
-                    </dl>
-                    <div class="social-links">
-                        <a href="https://github.com/Arb00" class="social-link">GitHub</a>
-                        <a href="https://www.linkedin.com/in/muhammadsabri67/" class="social-link">LinkedIn</a>
-                        <a href="mailto:muhammad.sabri51@ui.ac.id" class="social-link">Email</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="#top">soke</a>
+    <nav>
+      <ul class="site-nav">
+        <li><a href="#profil">Profil</a></li>
+        <li><a href="#pengalaman">Pengalaman</a></li>
+        <li><a href="#hobi">Hobi</a></li>
+        <li><a href="#edukasi">Edukasi</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
 
-    <footer class="site-footer">
-        <div class="container">
-            <p>&copy; 2026 Muhammad Sabri. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
+<main id="top">
+
+  <!-- ============ PROFIL ============ -->
+  <section class="hero" id="profil">
+    <div class="wrap">
+      <div class="hero-text">
+        <p class="hero-eyebrow">Pacilians</p>
+        <h1>Muhammad Sabri.</h1>
+        <p class="hero-npm">NPM: 2506623793</p>
+        <p class="hero-npm">Program Studi : Ilmu Komputer</p>
+        <p class="lede">
+          Info ngopi. Sabri adalah mahasiswa ilmu komputer di Universitas Indonesia. Katanya di Data Science bisa cenayang jadi saya belajar Data Science. Check my LinkedIn.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="https://www.linkedin.com/in/muhammadsabri67/">LinkedIn</a>
+          <a class="btn btn-primary" href="https://github.com/Arb00/">GitHub</a>
         </div>
-    </footer>
+      </div>
+      <figure class="hero-photo">
+        <img src="/static/img/MuhammadSabri_Staff_DSA.jpg" alt="Foto profil Sab">
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ PENGALAMAN ============ -->
+  <section class="block" id="pengalaman">
+    <div class="wrap">
+      <div class="block-head">
+        <h2>Pengalaman</h2>
+        <p class="block-note">Kalo kepo pencet gambarnya.... (sekarang belum bisa)</p>
+      </div>
+      <div class="exp-map" id="experience-map">
+        <!-- diisi otomatis oleh script.js dari data.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOBI ============ -->
+  <section class="block" id="hobi" style="padding-bottom:0;">
+    <div class="wrap">
+      <div class="block-head">
+        <h2>Hobi</h2>
+      </div>
+    </div>
+    <div class="filmstrip" id="hobby-slider">
+      <div class="sprockets"></div>
+      <div class="slider">
+        <div class="slider-track">
+          <!-- diisi otomatis oleh script.js dari data.js -->
+        </div>
+      </div>
+      <div class="sprockets"></div>
+      <div class="slider-dots"></div>
+    </div>
+  </section>
+
+  <!-- ============ EDUKASI ============ -->
+  <section class="block" id="edukasi">
+    <div class="wrap">
+      <div class="block-head">
+        <h2>Edukasi</h2>
+      </div>
+      <div class="edu-strip" id="education-strip">
+        <!-- diisi otomatis oleh script.js dari data.js -->
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <span>© 2026 Muhammad Sabri</span>
+    <span>Fasilkom UI</span>
+  </div>
+</footer>
+
+<script src="/static/js/data.js"></script>
+<script src="/static/js/script.js"></script>
 </body>
 </html>
