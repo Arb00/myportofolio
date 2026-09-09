@@ -35,7 +35,7 @@ const EXPERIENCES = [
     theme: "compfest",
     icon: "event",
     islandImage: "/static/img/compfest.png",
-    title: "Perwakilan COMPFEST 18",
+    title: "COMPFEST 18",
     org: "BEM Fasilkom UI",
     year: "2026",
     image: "https://picsum.photos/seed/compfest18/640/480",

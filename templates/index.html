@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Muhammad Sabri — Portofolio</title>
+<title>{{ name }} - Portofolio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/css/style.css">
@@ -12,15 +12,11 @@
 
 <header class="site-header">
   <div class="wrap">
-    <a class="brand" href="#top">soke</a>
+    <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
     <nav>
-      <ul class="site-nav">
-        <li><a href="#profil">Profil</a></li>
-        <li><a href="#pengalaman">Pengalaman</a></li>
-        <li><a href="#hobi">Hobi</a></li>
-        <li><a href="#edukasi">Edukasi</a></li>
-      </ul>
-    </nav>
+      <a href="{% url 'main:show_main' %}">Profile</a>
+      <a href="{% url 'main:show_experience' %}">Experience</a>
+  </nav>
   </div>
 </header>
 
@@ -31,19 +27,17 @@
     <div class="wrap">
       <div class="hero-text">
         <p class="hero-eyebrow">Pacilians</p>
-        <h1>Muhammad Sabri.</h1>
-        <p class="hero-npm">NPM: 2506623793</p>
-        <p class="hero-npm">Program Studi : Ilmu Komputer</p>
-        <p class="lede">
-          Info ngopi. Sabri adalah mahasiswa ilmu komputer di Universitas Indonesia. Katanya di Data Science bisa cenayang jadi saya belajar Data Science. Check my LinkedIn.
-        </p>
+        <h1>{{ name }}</h1>
+        <dd>{{ npm }}</dd>
+        <dd>{{ study_program }}</dd>
+        <p class="bio">{{ bio }}</p>
         <div class="hero-actions">
           <a class="btn btn-primary" href="https://www.linkedin.com/in/muhammadsabri67/">LinkedIn</a>
           <a class="btn btn-primary" href="https://github.com/Arb00/">GitHub</a>
         </div>
       </div>
       <figure class="hero-photo">
-        <img src="/static/img/MuhammadSabri_Staff_DSA.jpg" alt="Foto profil Sab">
+        <img class="avatar" src="/static/img/MuhammadSabri_Staff_DSA.jpg" alt="Photo of {{ name }}">
       </figure>
     </div>
   </section>
@@ -96,8 +90,7 @@
 
 <footer class="site-footer">
   <div class="wrap">
-    <span>© 2026 Muhammad Sabri</span>
-    <span>Fasilkom UI</span>
+    <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
   </div>
 </footer>
 
