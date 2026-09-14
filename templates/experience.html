@@ -21,11 +21,17 @@
 
             {% for experience in experience_list %}
 
-                <article class="experience-card">
+                <a class="experience-card" href="{% url 'main:show_experience_detail' experience.id %}">
 
-                    <span class="experience-category">
-                        {{ experience.get_category_display }}
-                    </span>
+                    <div class="card-top">
+                        <span class="experience-category">
+                            {{ experience.get_category_display }}
+                        </span>
+
+                        {% if experience.thumbnail %}
+                            <img class="card-logo" src="{{ experience.thumbnail }}" alt="" loading="lazy">
+                        {% endif %}
+                    </div>
 
                     <h2>
                         {{ experience.title }}
@@ -49,7 +55,9 @@
 
                     {% endif %}
 
-                </article>
+                    <span class="card-cta">Lihat detail &rarr;</span>
+
+                </a>
 
             {% empty %}
 

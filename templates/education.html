@@ -23,9 +23,15 @@
 
                 <article class="education-card">
 
-                    <span class="education-level">
-                        {{ education.get_level_display }}
-                    </span>
+                    <div class="card-top">
+                        <span class="education-level">
+                            {{ education.get_level_display }}
+                        </span>
+
+                        {% if education.logo %}
+                            <img class="card-logo" src="{{ education.logo }}" alt="" loading="lazy">
+                        {% endif %}
+                    </div>
 
                     {% if education.website %}
                         <h2>
@@ -40,10 +46,6 @@
                         <h2>
                             {{ education.institution }}
                         </h2>
-                    {% endif %}
-
-                    {% if edu.logo %}
-                        <img src="{{ edu.logo.url }}" alt="Logo {{ edu.title }}" class="school-logo">
                     {% endif %}
 
                     {% if education.field_of_study %}

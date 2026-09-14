@@ -810,11 +810,14 @@ section.block {
 
 .experience-card,
 .education-card {
+    display: block;
     padding: 1.5rem;
     background-color: var(--card-bg);
     border: 1px solid var(--line);
     border-radius: var(--radius);
     box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: inherit;
     transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
@@ -823,6 +826,41 @@ section.block {
 .education-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-md);
+}
+
+/* Teks ajakan "Lihat detail" — cuma dipakai di kartu Experience
+   karena hanya itu yang punya halaman detail sejauh ini */
+.card-cta {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--accent-dark);
+}
+
+.experience-card:hover .card-cta {
+    text-decoration: underline;
+}
+
+/* Baris atas kartu: badge kategori (kiri) sejajar dengan logo (kanan) */
+.card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 0.9rem;
+}
+
+/* Logo/thumbnail — muncul kalau field thumbnail (Experience) atau
+   logo (Education) diisi URL gambar lewat Django admin */
+.card-logo {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    border-radius: 8px;
+    background: var(--paper-deep);
+    padding: 5px;
+    flex-shrink: 0;
 }
 
 .experience-category,
@@ -914,4 +952,49 @@ section.block {
 .experience-status[data-ongoing="true"]::before,
 .education-status[data-ongoing="true"]::before {
     background: var(--amber-bright);
+}
+/* ============================================================
+   HALAMAN DETAIL EXPERIENCE (experience_detail.html)
+   ============================================================ */
+.detail-section {
+    padding: 4rem 0 5rem;
+}
+
+.detail-section .back-link {
+    display: inline-block;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent-dark);
+    text-decoration: none;
+}
+
+.detail-section .back-link:hover {
+    text-decoration: underline;
+}
+
+.detail-logo {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    border-radius: 10px;
+    background: var(--paper-deep);
+    padding: 8px;
+    margin-bottom: 1.25rem;
+}
+
+.detail-section h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    margin: 0.6rem 0 0.5rem;
+    max-width: 20ch;
+}
+
+.detail-body {
+    margin-top: 1.5rem;
+    max-width: 62ch;
+    font-size: 1.05rem;
+    color: var(--ink-text);
+    line-height: 1.7;
 }

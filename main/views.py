@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 
 from main.models import Experience, Education
 
@@ -22,6 +22,15 @@ def show_experience(request):
         "experience_list": Experience.objects.all(),
     }
     return render(request, "experience.html", context)
+
+
+def show_experience_detail(request, id):
+    context = {
+        "name": "Muhammad Sabri",
+        "experience": get_object_or_404(Experience, id=id),
+    }
+    return render(request, "experience_detail.html", context)
+
 
 def show_education(request):
     context = {

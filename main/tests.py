@@ -58,6 +58,33 @@ class MainTest(TestCase):
         self.assertContains(response, "Selesai")
         self.assertNotContains(response, "Sedang berlangsung")
 
+    def test_experience_card_links_to_its_detail_page(self):
+        """Tiap kartu di halaman list Experience mengarah ke URL detailnya."""
+        response = self.client.get(reverse("main:show_experience"))
+        detail_url = reverse("main:show_experience_detail", args=[self.experience.id])
+
+        self.assertContains(response, f'href="{detail_url}"')
+
+    def test_experience_detail_url_is_accessible_and_uses_correct_template(self):
+        detail_url = reverse("main:show_experience_detail", args=[self.experience.id])
+        response = self.client.get(detail_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "experience_detail.html")
+        self.assertContains(response, self.experience.title)
+        self.assertContains(response, self.experience.description)
+        self.assertContains(response, f'href="{reverse("main:show_experience")}"')
+
+    def test_experience_detail_returns_404_for_unknown_id(self):
+        import uuid
+
+        random_id = uuid.uuid4()
+        response = self.client.get(
+            reverse("main:show_experience_detail", args=[random_id])
+        )
+
+        self.assertEqual(response.status_code, 404)
+
 
 class EducationTest(TestCase):
     """Kasus uji untuk fitur Education (Individual Assignment 2)."""
