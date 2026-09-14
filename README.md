@@ -4,7 +4,7 @@ NPM  : 2506623793
 
 Kelas: PBP C
 
-Tugas:
+### Tugas 1:
 1. Saya menggunakan <section> untuk mengelompokkan secara terpisah profile, pengalaman, hobi, dan edukasi. saya tidak menggunakan <article> dan <aside> karena beberapa alasan diantaranya adalah saran dari Ai dan kurangnya pengalaman menggunakan hal tersebut. saya akan mencoba untuk menggunakan <article> dan <aside> saat membuat halaman yang lebih detail untuk bagian pengalaman. 
 2. Masalah yang saya temukan adalah kadang letak gambar yang saya inginkan saat di desktop dan saat di ukuran yang berbeda tidak seperti yang saya inginkan. Namun dengan menggunakan AI saya bisa dengan mudah menyelesaikannya. saya sendiri tidak mengevaluasi elemen mana yang harus diubah tapi mengevaluasi hasil kerja AI.
 3. Keterbatasan dari web static adalah saya tidak bisa mendapat masukan dari user. saya ingin membuat suatu game interaktif yang bisa dimainkan oleh user selama berada di web saya. contoh game nya seperti catur. saya ingin buat game dimana user melawan bot catur.
@@ -16,6 +16,8 @@ AI disclosure :
 - ChatGPT      :  Saya menggunakan ChatGPT untuk mengenerate gambar-gambar yang saya gunakan di page halaman. Gambar-gambar hasil generate 
                   adalah logo basket dan logo teater.
 - link ChatGPT tugas 1 : https://chatgpt.com/share/6a9e6d45-ffbc-83ec-9bf2-87c973575472
+
+note : experience akan dibuat jadi folder dan ditambahkan beberapa file html yang akan menjelaskan masing-masing pengalaman
 
 - ChatGPT      : Pada tugas 2 saya menggunakan chatGPT untuk lebih memahami cara penggunaan django dan saya menjadi paham bagaimana cara 
                  membuat code rapi dan membuat superuser atau akun admin untuk bisa menambah data dengan lebih baik. Saya jadi paham penggunaan model.py, urls.py, dan views.py. Saya juga menggunakan ChatGP untuk mengotak-atik html css pada awalnya.
@@ -29,4 +31,11 @@ AI disclosure :
            jumlah yang besar sehingga gemini menjadi pilihan saya untuk bertanya. pada awalnya juga saya mencoba menggunakan gemini untuk html dan css namun hasilnya kurang bagus jadi saya tidak menggunakannya.
 - link Gemini : https://share.gemini.google/HANvtNMyHhdJ
 
-note : experience akan dibuat jadi folder dan ditambahkan beberapa file html yang akan menjelaskan masing-masing pengalaman
+### TUGAS 2 :
+
+1. Saat user akses URL pertama itu ke urls.py punya project dulu karena punya project itu adalah bagian utamanya gitu. Baru setelah itu
+   akses di dalam bagian utama itu di arahkan pake urls.py punya app. View mengeksekusi logika bisnis. View meminta data yang diminta model. Model itu kita buat sesuai kebutuhan. jadi kita atur aja modelnya sesuai kebutuhan. misalnya di experience butuh data apa aja atau di education butuh data aja kita buat di model. Template itu ya buat fondasi webnya supaya misal datanya update webnya tetap bagus.
+2. Lebih bagus di model karena lebih gampang di update dan kalo misal datanya banyak kan susah buat di tambahin. Bayangin aja tokped 
+   nambahin barangnya manual satu persatu. hal seperti itu sangat tidak efektif. jadi penggunaan model untuk data sangat krusial untuk hal yang perlu banyak ditampilkan.
+3. Kedua hal tersebut harus dibuat untuk bisa sukses perubahan yang kita buat. kita mau ubah model ni. kita perlu makemigrations untuk
+   membuat semacam blue print dan perlu migrate untuk mengubah blue print sebelumnya dengan blue print baru yang dibuat oleh makemigrations paling baru.
