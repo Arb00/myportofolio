@@ -1,0 +1,64 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+            {{ name }} - Portofolio
+        {% endblock %}
+    </title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+
+<a class="skip-link" href="#top">Langsung ke konten utama</a>
+
+<header class="site-header">
+    <div class="wrap">
+
+        <a href="{% url 'main:show_main' %}" class="brand">
+            {{ name }}
+        </a>
+
+        <nav class="site-nav">
+            <a href="{% url 'main:show_main' %}">Profile</a>
+            <a href="{% url 'main:show_experience' %}">Experience</a>
+            <a href="{% url 'main:show_education' %}">Education</a>
+        </nav>
+
+    </div>
+</header>
+
+
+<main id="top">
+
+    {% block content %}
+    {% endblock %}
+
+</main>
+
+
+<footer class="site-footer">
+    <div class="wrap">
+        <p>
+            &copy; 2026 {{ name }}.
+            Fakultas Ilmu Komputer, Universitas Indonesia.
+        </p>
+    </div>
+</footer>
+
+
+<script src="{% static 'js/data.js' %}"></script>
+<script src="{% static 'js/script.js' %}"></script>
+
+</body>
+</html>

@@ -39,7 +39,8 @@ class Education(models.Model):
     level = models.CharField(max_length=10, choices=EDUCATION_LEVEL_CHOICES)
     field_of_study = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
-    logo = models.URLField(blank=True, null=True)
+    logo = models.ImageField(upload_to='education_logos/', blank=True, null=True)
+    website = models.URLField(blank=True, null=True)
     started_at = models.DateField()
     ended_at = models.DateField(blank=True, null=True)
 

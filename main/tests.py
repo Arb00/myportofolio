@@ -1,8 +1,9 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from datetime import date
 
-from main.models import Experience
+from main.models import Experience, Education
 
 
 class MainTest(TestCase):
@@ -56,3 +57,65 @@ class MainTest(TestCase):
         self.assertFalse(self.experience.is_ongoing)
         self.assertContains(response, "Selesai")
         self.assertNotContains(response, "Sedang berlangsung")
+
+
+class EducationTest(TestCase):
+    """Kasus uji untuk fitur Education (Individual Assignment 2)."""
+
+    def setUp(self):
+        self.education = Education.objects.create(
+            institution="Universitas Indonesia",
+            level="S1",
+            field_of_study="Ilmu Komputer",
+            description="Berfokus pada sains data dan kecerdasan buatan.",
+            started_at=date(2024, 8, 1),
+        )
+
+    def test_education_url_is_accessible_and_uses_correct_template(self):
+        """URL /education/ dapat diakses dan menggunakan template education.html."""
+        response = self.client.get(reverse("main:show_education"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "education.html")
+        # navbar & footer tetap konsisten dengan halaman lain
+        self.assertContains(response, f'href="{reverse("main:show_main")}"')
+        self.assertContains(response, f'href="{reverse("main:show_experience")}"')
+
+    def test_education_page_shows_data_when_available(self):
+        """Data model Education muncul di halaman HTML ketika data ada."""
+        response = self.client.get(reverse("main:show_education"))
+
+        self.assertContains(response, self.education.institution)
+        self.assertContains(response, self.education.field_of_study)
+        self.assertContains(response, self.education.description)
+        self.assertContains(response, "Sarjana")  # get_level_display()
+        self.assertContains(response, "Sedang berlangsung")
+
+    def test_empty_education_page_shows_empty_state(self):
+        """Halaman menampilkan pesan kondisi kosong ketika belum ada data."""
+        Education.objects.all().delete()
+        response = self.client.get(reverse("main:show_education"))
+
+        self.assertContains(response, "Belum ada pendidikan yang ditambahkan.")
+
+    def test_completed_education(self):
+        self.education.ended_at = date(2028, 6, 30)
+        self.education.save()
+        response = self.client.get(reverse("main:show_education"))
+
+        self.assertContains(response, "Selesai")
+
+    def test_institution_name_links_to_website_when_set(self):
+        """Nama institusi jadi tautan ke situs sekolah kalau field website diisi."""
+        self.education.website = "https://www.ui.ac.id"
+        self.education.save()
+        response = self.client.get(reverse("main:show_education"))
+
+        self.assertContains(response, f'href="{self.education.website}"')
+        self.assertContains(response, 'class="education-link"')
+
+    def test_institution_name_is_plain_text_when_website_is_empty(self):
+        """Kalau website kosong, nama institusi tetap tampil tanpa tautan."""
+        response = self.client.get(reverse("main:show_education"))
+
+        self.assertNotContains(response, "education-link")

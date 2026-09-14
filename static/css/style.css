@@ -14,11 +14,36 @@
   --line: #C9BFA5;
   --line-dark: #3A4547;
 
+  /* Token tambahan — dipakai oleh kartu Experience & Education */
+  --accent-dark: var(--teal);
+  --text-muted: #6b6f65;
+  --radius: 10px;
+  --card-bg: #ffffff;
+  --shadow-sm: 0 1px 3px rgba(18, 24, 27, 0.08);
+  --shadow-md: 0 10px 24px rgba(18, 24, 27, 0.12);
+
   --font-display: "Newsreader", Georgia, serif;
   --font-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --font-mono: "IBM Plex Mono", "Courier New", monospace;
 
   --content-width: 1080px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -48px;
+  background: var(--ink);
+  color: var(--paper-text);
+  padding: 10px 16px;
+  border-radius: 4px;
+  text-decoration: none;
+  z-index: 100;
+  transition: top 0.15s ease;
+}
+
+.skip-link:focus {
+  top: 12px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -27,15 +52,56 @@
 
 * { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+  height: 100%;
+}
 
 body {
   margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   background: var(--paper);
   color: var(--ink-text);
   font-family: var(--font-body);
   font-size: 17px;
   line-height: 1.6;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Footer selalu menempel di bawah viewport, walau konten halaman pendek
+   (misalnya halaman Education dengan sedikit data). */
+main {
+  flex: 1 0 auto;
+}
+
+.site-footer {
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   CUSTOM SCROLLBAR (fitur ekstra murni CSS)
+   ============================================================ */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-dark) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--line-dark);
+  border-radius: 999px;
+  border: 2px solid var(--paper);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--teal);
 }
 
 img { max-width: 100%; display: block; }
@@ -130,11 +196,34 @@ button:focus-visible {
   margin-bottom: 18px;
 }
 
-.hero-npm {
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 28px;
+  margin: -12px 0 20px;
+  padding: 0;
+}
+
+.hero-meta__row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.hero-meta dt {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--teal);
+  margin: 0;
+}
+
+.hero-meta dd {
   font-family: var(--font-mono);
   font-size: 0.85rem;
-  color: #55594f;
-  margin: -16px 0 20px;
+  color: var(--text-muted);
+  margin: 0;
 }
 
 .hero h1 {
@@ -685,10 +774,14 @@ section.block {
   .block-head { flex-direction: column; align-items: flex-start; }
   .block-head .block-note { text-align: left; }
 }
-.experience-section {
+/* ============================================================
+   EXPERIENCE & EDUCATION — halaman daftar server-rendered
+   (dipakai bersama oleh experience.html dan education.html)
+   ============================================================ */
+.experience-section,
+.education-section {
     padding: 4rem 0;
     border-top: 1px solid var(--line);
-    
 }
 
 .section-kicker {
@@ -697,45 +790,128 @@ section.block {
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    font-family: var(--font-mono);
 }
 
-.experience-section h1 {
-    margin: 0.4rem 0 1.5rem;
-    font-size: 2rem;
+.experience-section h1,
+.education-section h1 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    margin: 0.4rem 0 2rem;
+    font-size: clamp(1.75rem, 4vw, 2.4rem);
 }
 
-.experience-grid {
+.experience-grid,
+.education-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
-.experience-card {
-    padding: 1.25rem;
-    background-color: #fff;
+.experience-card,
+.education-card {
+    padding: 1.5rem;
+    background-color: var(--card-bg);
     border: 1px solid var(--line);
     border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
-.experience-category {
+/* Elevation saat hover — salah satu fitur interaktif ekstra */
+.experience-card:hover,
+.education-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.experience-category,
+.education-level {
+    display: inline-block;
     color: var(--accent-dark);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 700;
+    letter-spacing: 0.03em;
     text-transform: uppercase;
+    font-family: var(--font-mono);
+    background: var(--paper-deep);
+    padding: 3px 10px;
+    border-radius: 999px;
 }
 
 .experience-card h2 {
-    margin: 0.5rem 0;
+    font-family: var(--font-display);
+    font-weight: 500;
+    margin: 0.65rem 0 0.4rem;
     font-size: 1.25rem;
 }
 
-.experience-description,
-.empty-state {
-    color: var(--text-muted);
+.education-card h2 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    margin: 0.65rem 0 0.15rem;
+    font-size: 1.25rem;
 }
 
-.experience-status {
+.education-field {
+    font-size: 0.9rem;
+    color: var(--accent-dark);
+    margin: 0 0 0.5rem;
+}
+
+/* Nama institusi jadi tautan kalau field "website" diisi di admin */
+.education-link {
+    color: inherit;
+    text-decoration: none;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0% 1px;
+    transition: background-size 0.18s ease;
+}
+
+.education-link:hover,
+.education-link:focus-visible {
+    background-size: 100% 1px;
+}
+
+.experience-description,
+.education-description,
+.empty-state {
+    color: var(--text-muted);
+    line-height: 1.55;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1rem;
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+}
+
+.experience-status,
+.education-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     margin-top: 1rem;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
+}
+
+/* Titik indikator status — kuning untuk "sedang berlangsung", abu untuk "selesai".
+   Warna ditentukan lewat atribut data-ongoing (diset di template). */
+.experience-status::before,
+.education-status::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-muted);
+}
+
+.experience-status[data-ongoing="true"]::before,
+.education-status[data-ongoing="true"]::before {
+    background: var(--amber-bright);
 }

@@ -1,121 +1,91 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% extends "base.html" %}
+{% load static %}
 
-<title>Education - {{ name }}</title>
+{% block title %}
+    Education - {{ name }}
+{% endblock %}
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+{% block content %}
 
-<link rel="stylesheet" href="/static/css/style.css">
-</head>
+<section class="education-section">
 
-<body>
+    <div class="wrap">
 
-<header class="site-header">
-  <div class="wrap">
+        <p class="section-kicker">
+            Perjalanan pendidikan saya
+        </p>
 
-    <a href="{% url 'main:show_main' %}" class="brand">
-      {{ name }}
-    </a>
+        <h1>Education</h1>
 
-    <nav>
-      <a href="{% url 'main:show_main' %}">Profile</a>
-      <a href="{% url 'main:show_experience' %}">Experience</a>
-      <a href="{% url 'main:show_education' %}">Education</a>
-    </nav>
+        <div class="education-grid">
 
-  </div>
-</header>
+            {% for education in education_list %}
 
+                <article class="education-card">
 
-<main>
+                    <span class="education-level">
+                        {{ education.get_level_display }}
+                    </span>
 
-    <section class="experience-section" id="education">
-
-        <div class="container">
-
-            <p class="section-kicker">
-                Perjalanan pendidikan saya
-            </p>
-
-            <h1>Education</h1>
-
-
-            <div class="experience-grid">
-
-                {% for education in education_list %}
-
-                    <article class="experience-card">
-
-                        <span class="experience-category">
-                            {{ education.get_level_display }}
-                        </span>
-
+                    {% if education.website %}
+                        <h2>
+                            <a class="education-link"
+                               href="{{ education.website }}"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                {{ education.institution }}
+                            </a>
+                        </h2>
+                    {% else %}
                         <h2>
                             {{ education.institution }}
                         </h2>
+                    {% endif %}
 
-                        {% if education.field_of_study %}
-                            <p class="experience-description">
-                                {{ education.field_of_study }}
-                            </p>
-                        {% endif %}
+                    {% if edu.logo %}
+                        <img src="{{ edu.logo.url }}" alt="Logo {{ edu.title }}" class="school-logo">
+                    {% endif %}
 
-                        {% if education.description %}
-                            <p class="experience-description">
-                                {{ education.description }}
-                            </p>
-                        {% endif %}
+                    {% if education.field_of_study %}
+                        <p class="education-field">
+                            {{ education.field_of_study }}
+                        </p>
+                    {% endif %}
 
+                    {% if education.description %}
+                        <p class="education-description">
+                            {{ education.description }}
+                        </p>
+                    {% endif %}
 
-                        {% if education.ended_at %}
-                            <p class="experience-status">
-                                Selesai
-                            </p>
-                        {% else %}
-                            <p class="experience-status">
-                                Sedang berlangsung
-                            </p>
-                        {% endif %}
+                    {% if education.ended_at %}
 
-                    </article>
+                        <p class="education-status" data-ongoing="false">
+                            Selesai
+                        </p>
 
-                {% empty %}
+                    {% else %}
 
-                    <p class="empty-state">
-                        Belum ada pendidikan yang ditambahkan.
-                    </p>
+                        <p class="education-status" data-ongoing="true">
+                            Sedang berlangsung
+                        </p>
 
-                {% endfor %}
+                    {% endif %}
 
-            </div>
+                </article>
+
+            {% empty %}
+
+                <p class="empty-state">
+                    Belum ada pendidikan yang ditambahkan.
+                </p>
+
+            {% endfor %}
 
         </div>
 
-    </section>
+    </div>
 
-</main>
+</section>
 
-
-<footer class="site-footer">
-
-  <div class="wrap">
-
-    <p>
-      &copy; 2026 {{ name }}.
-      Fakultas Ilmu Komputer, Universitas Indonesia.
-    </p>
-
-  </div>
-
-</footer>
-
-
-<script src="/static/js/data.js"></script>
-<script src="/static/js/script.js"></script>
-
-</body>
-</html>
+{% endblock %}

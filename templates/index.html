@@ -1,101 +1,178 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{ name }} - Portofolio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,500;1,400;1,500&family=Archivo:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
+{% extends "base.html" %}
+{% load static %}
 
-<header class="site-header">
-  <div class="wrap">
-    <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
-    <nav>
-      <a href="{% url 'main:show_main' %}">Profile</a>
-      <a href="{% url 'main:show_experience' %}">Experience</a>
-      <a href="{% url 'main:show_education' %}">Education</a>
-  </nav>
-  </div>
-</header>
+{% block title %}
+    {{ name }} - Portofolio
+{% endblock %}
 
-<main id="top">
+{% block content %}
 
-  <!-- ============ PROFIL ============ -->
-  <section class="hero" id="profil">
+<!-- ============ PROFIL ============ -->
+<section class="hero" id="profil">
+
     <div class="wrap">
-      <div class="hero-text">
-        <p class="hero-eyebrow">Pacilians</p>
-        <h1>{{ name }}</h1>
-        <dd>{{ npm }}</dd>
-        <dd>{{ study_program }}</dd>
-        <p class="bio">{{ bio }}</p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="https://www.linkedin.com/in/muhammadsabri67/">LinkedIn</a>
-          <a class="btn btn-primary" href="https://github.com/Arb00/">GitHub</a>
+
+        <div class="hero-text">
+
+            <p class="hero-eyebrow">
+                Pacilians
+            </p>
+
+            <h1>
+                {{ name }}
+            </h1>
+
+            <dl class="hero-meta">
+                <div class="hero-meta__row">
+                    <dt>NPM</dt>
+                    <dd>{{ npm }}</dd>
+                </div>
+                <div class="hero-meta__row">
+                    <dt>Program Studi</dt>
+                    <dd>{{ study_program }}</dd>
+                </div>
+            </dl>
+
+            <p class="bio">
+                {{ bio }}
+            </p>
+
+            <div class="hero-actions">
+
+                <a
+                    class="btn btn-primary"
+                    href="https://www.linkedin.com/in/muhammadsabri67/"
+                >
+                    LinkedIn
+                </a>
+
+                <a
+                    class="btn btn-primary"
+                    href="https://github.com/Arb00/"
+                >
+                    GitHub
+                </a>
+
+            </div>
+
         </div>
-      </div>
-      <figure class="hero-photo">
-        <img class="avatar" src="/static/img/MuhammadSabri_Staff_DSA.jpg" alt="Photo of {{ name }}">
-      </figure>
-    </div>
-  </section>
 
-  <!-- ============ PENGALAMAN ============ -->
-  <section class="block" id="pengalaman">
-    <div class="wrap">
-      <div class="block-head">
-        <h2>Pengalaman</h2>
-        <p class="block-note">Kalo kepo pencet gambarnya.... (sekarang belum bisa)</p>
-      </div>
-      <div class="exp-map" id="experience-map">
-        <!-- diisi otomatis oleh script.js dari data.js -->
-      </div>
-    </div>
-  </section>
 
-  <!-- ============ HOBI ============ -->
-  <section class="block" id="hobi" style="padding-bottom:0;">
-    <div class="wrap">
-      <div class="block-head">
-        <h2>Hobi</h2>
-      </div>
+        <figure class="hero-photo">
+
+            <img
+                class="avatar"
+                src="{% static 'img/MuhammadSabri_Staff_DSA.jpg' %}"
+                alt="Photo of {{ name }}"
+            >
+
+        </figure>
+
     </div>
-    <div class="filmstrip" id="hobby-slider">
-      <div class="sprockets"></div>
-      <div class="slider">
-        <div class="slider-track">
-          <!-- diisi otomatis oleh script.js dari data.js -->
+
+</section>
+
+
+<!-- ============ PENGALAMAN ============ -->
+<section class="block" id="pengalaman">
+
+    <div class="wrap">
+
+        <div class="block-head">
+
+            <h2>
+                Pengalaman
+            </h2>
+
+            <p class="block-note">
+                Kalo kepo pencet gambarnya.... (sekarang belum bisa)
+            </p>
+
         </div>
-      </div>
-      <div class="sprockets"></div>
-      <div class="slider-dots"></div>
-    </div>
-  </section>
 
-  <!-- ============ EDUKASI ============ -->
-  <section class="block" id="edukasi">
+
+        <div
+            class="exp-map"
+            id="experience-map"
+        >
+            <!--
+                diisi otomatis oleh script.js
+                dari data.js
+            -->
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ============ HOBI ============ -->
+<section
+    class="block"
+    id="hobi"
+    style="padding-bottom:0;"
+>
+
     <div class="wrap">
-      <div class="block-head">
-        <h2>Edukasi</h2>
-      </div>
-      <div class="edu-strip" id="education-strip">
-        <!-- diisi otomatis oleh script.js dari data.js -->
-      </div>
+
+        <div class="block-head">
+
+            <h2>
+                Hobi
+            </h2>
+
+        </div>
+
     </div>
-  </section>
 
-</main>
 
-<footer class="site-footer">
-  <div class="wrap">
-    <p>&copy; 2026 {{ name }}. Fakultas Ilmu Komputer, Universitas Indonesia.</p>
-  </div>
-</footer>
+    <div
+        class="filmstrip"
+        id="hobby-slider"
+    >
 
-<script src="/static/js/data.js"></script>
-<script src="/static/js/script.js"></script>
-</body>
-</html>
+        <div class="sprockets"></div>
+
+        <div class="slider">
+
+            <div class="slider-track">
+                <!-- diisi otomatis oleh script.js dari data.js -->
+            </div>
+
+        </div>
+
+        <div class="sprockets"></div>
+
+        <div class="slider-dots"></div>
+
+    </div>
+
+</section>
+
+
+<!-- ============ EDUKASI ============ -->
+<section class="block" id="edukasi">
+
+    <div class="wrap">
+
+        <div class="block-head">
+
+            <h2>
+                Edukasi
+            </h2>
+
+        </div>
+
+
+        <div
+            class="edu-strip"
+            id="education-strip"
+        >
+            <!-- diisi otomatis oleh script.js dari data.js -->
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
