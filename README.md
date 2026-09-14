@@ -15,6 +15,18 @@ AI disclosure :
 - link claude  : https://claude.ai/share/61eb4d44-1735-432a-89c3-8c86561130ae
 - ChatGPT      :  Saya menggunakan ChatGPT untuk mengenerate gambar-gambar yang saya gunakan di page halaman. Gambar-gambar hasil generate 
                   adalah logo basket dan logo teater.
-- link ChatGPT : https://chatgpt.com/share/6a9e6d45-ffbc-83ec-9bf2-87c973575472
+- link ChatGPT tugas 1 : https://chatgpt.com/share/6a9e6d45-ffbc-83ec-9bf2-87c973575472
+
+- ChatGPT      : Pada tugas 2 saya menggunakan chatGPT untuk lebih memahami cara penggunaan django dan saya menjadi paham bagaimana cara 
+                 membuat code rapi dan membuat superuser atau akun admin untuk bisa menambah data dengan lebih baik. Saya jadi paham penggunaan model.py, urls.py, dan views.py. Saya juga menggunakan ChatGP untuk mengotak-atik html css pada awalnya.
+- link ChatGPT tugas 2 : https://chatgpt.com/share/6aa81190-d0d8-83ec-8aaa-d57ce699a69b
+
+- Claude sonnet : Saya menggunakan claude pada tugas 2 ini untuk membantu optimalisasi css dan html karena dari awal saya menggunakan 
+                  claude untuk proses itu. jadi saya rasa claude adalah pilihan paling tepat karena sudah memahami kerangka awal html css.
+- link claude sonnet tugas 2 : https://claude.ai/share/61eb4d44-1735-432a-89c3-8c86561130ae
+
+- Gemini : Saya menggunakan gemini untuk bertanya hal-hal yang tidak terlalu penting karena gemini bisa mengirim gambar dan text dalam 
+           jumlah yang besar sehingga gemini menjadi pilihan saya untuk bertanya. pada awalnya juga saya mencoba menggunakan gemini untuk html dan css namun hasilnya kurang bagus jadi saya tidak menggunakannya.
+- link Gemini : https://share.gemini.google/HANvtNMyHhdJ
 
 note : experience akan dibuat jadi folder dan ditambahkan beberapa file html yang akan menjelaskan masing-masing pengalaman
