@@ -85,6 +85,65 @@ class MainTest(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_create_experience_page_and_valid_submission(self):
+        create_url = reverse("main:create_experience")
+        response = self.client.get(create_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "experience_form.html")
+
+        response = self.client.post(
+            create_url,
+            {
+                "title": "Asisten Praktikum",
+                "category": "part-time",
+                "description": "Mendampingi praktikum mahasiswa.",
+                "thumbnail": "",
+                "ended_at": "",
+            },
+        )
+
+        self.assertRedirects(response, reverse("main:show_experience"))
+        self.assertTrue(Experience.objects.filter(title="Asisten Praktikum").exists())
+
+    def test_experience_json_and_xml_endpoints(self):
+        json_response = self.client.get(reverse("main:get_experience_json"))
+        xml_response = self.client.get(reverse("main:get_experience_xml"))
+
+        self.assertEqual(json_response.status_code, 200)
+        self.assertEqual(json_response["Content-Type"], "application/json")
+        self.assertContains(json_response, self.experience.title)
+        self.assertEqual(xml_response.status_code, 200)
+        self.assertEqual(xml_response["Content-Type"], "application/xml")
+        self.assertContains(xml_response, self.experience.title)
+
+    def test_experience_json_and_xml_by_id_endpoints(self):
+        json_url = reverse(
+            "main:get_experience_json_by_id", args=[self.experience.id]
+        )
+        xml_url = reverse(
+            "main:get_experience_xml_by_id", args=[self.experience.id]
+        )
+
+        json_response = self.client.get(json_url)
+        xml_response = self.client.get(xml_url)
+
+        self.assertEqual(json_response.status_code, 200)
+        self.assertEqual(json_response["Content-Type"], "application/json")
+        self.assertContains(json_response, self.experience.title)
+        self.assertEqual(xml_response.status_code, 200)
+        self.assertEqual(xml_response["Content-Type"], "application/xml")
+        self.assertContains(xml_response, self.experience.title)
+
+    def test_delete_experience_requires_post(self):
+        delete_url = reverse("main:delete_experience", args=[self.experience.id])
+        self.client.get(delete_url)
+        self.assertTrue(Experience.objects.filter(pk=self.experience.id).exists())
+
+        response = self.client.post(delete_url)
+        self.assertRedirects(response, reverse("main:show_experience"))
+        self.assertFalse(Experience.objects.filter(pk=self.experience.id).exists())
+
 
 class EducationTest(TestCase):
     """Kasus uji untuk fitur Education (Individual Assignment 2)."""

@@ -17,11 +17,29 @@
 
         <h1>Experience</h1>
 
+        {% if messages %}
+            {% for message in messages %}
+                <p class="message message-{{ message.tags }}" role="status">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <div class="experience-toolbar">
+            <form class="experience-search" method="GET">
+                <label for="title">Cari experience</label>
+                <div class="experience-search__controls">
+                    <input id="title" type="search" name="title" value="{{ title_query }}" placeholder="Cari berdasarkan judul">
+                    <button type="submit">Cari</button>
+                </div>
+            </form>
+            <a class="btn btn-primary" href="{% url 'main:create_experience' %}">+ Tambah experience</a>
+        </div>
+
         <div class="experience-grid">
 
             {% for experience in experience_list %}
 
-                <a class="experience-card" href="{% url 'main:show_experience_detail' experience.id %}">
+                <div class="experience-item">
+                    <a class="experience-card" href="{% url 'main:show_experience_detail' experience.id %}">
 
                     <div class="card-top">
                         <span class="experience-category">
@@ -57,12 +75,19 @@
 
                     <span class="card-cta">Lihat detail &rarr;</span>
 
-                </a>
+                    </a>
+
+                    {% include "components/experience_delete_modal.html" with experience=experience %}
+                </div>
 
             {% empty %}
 
                 <p class="empty-state">
-                    Belum ada pengalaman yang ditambahkan.
+                    {% if title_query %}
+                        Tidak ada experience dengan judul tersebut.
+                    {% else %}
+                        Belum ada pengalaman yang ditambahkan.
+                    {% endif %}
                 </p>
 
             {% endfor %}
