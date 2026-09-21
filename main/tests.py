@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 from datetime import date
 
-from main.models import Experience, Education
+from main.models import Education, Experience, Project
 
 
 class MainTest(TestCase):
@@ -205,3 +205,86 @@ class EducationTest(TestCase):
         response = self.client.get(reverse("main:show_education"))
 
         self.assertNotContains(response, "education-link")
+
+
+class ProjectTest(TestCase):
+    def setUp(self):
+        self.project = Project.objects.create(
+            title="Fern AI Assistant",
+            description="Build personal AI Assistant with Hermes and Gemini API.",
+            tech_stack="AWS, Gemini API, Hermes, Discord Bot",
+            project_url="https://github.com/example/fern-ai",
+            project_image_url="https://example.com/image.png",
+        )
+
+    def test_project_str(self):
+        self.assertEqual(str(self.project), "Fern AI Assistant")
+
+    def test_show_projects_view(self):
+        response = self.client.get(reverse("main:show_projects"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "project.html")
+        self.assertContains(response, self.project.title)
+        self.assertContains(response, self.project.tech_stack)
+        self.assertContains(response, self.project.description)
+
+    def test_show_projects_filter(self):
+        response = self.client.get(reverse("main:show_projects"), {"title": "Fern"})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.project.title)
+
+        response_not_found = self.client.get(reverse("main:show_projects"), {"title": "NonExistent"})
+        self.assertEqual(response_not_found.status_code, 200)
+        self.assertContains(response_not_found, "Tidak ada proyek dengan nama tersebut.")
+
+    def test_empty_projects(self):
+        Project.objects.all().delete()
+        response = self.client.get(reverse("main:show_projects"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Belum ada proyek yang ditambahkan.")
+
+    def test_create_project_view_get(self):
+        response = self.client.get(reverse("main:create_project"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "projects_form.html")
+
+    def test_create_project_view_post_valid(self):
+        data = {
+            "title": "New Web Project",
+            "description": "A very cool new web project",
+            "tech_stack": "Django, HTML, CSS",
+            "project_url": "https://github.com/example/web-project",
+            "project_image_url": "https://example.com/img.png",
+        }
+        response = self.client.post(reverse("main:create_project"), data=data)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Project.objects.filter(title="New Web Project").exists())
+
+    def test_delete_project(self):
+        response = self.client.post(reverse("main:delete_project", kwargs={"project_id": self.project.id}))
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(Project.objects.filter(id=self.project.id).exists())
+
+    def test_get_projects_json(self):
+        response = self.client.get(reverse("main:get_projects_json"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/json")
+        self.assertContains(response, "Fern AI Assistant")
+
+    def test_get_project_json_by_id(self):
+        response = self.client.get(reverse("main:get_project_json_by_id", kwargs={"project_id": self.project.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/json")
+        self.assertContains(response, "Fern AI Assistant")
+
+    def test_get_projects_xml(self):
+        response = self.client.get(reverse("main:get_projects_xml"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/xml")
+        self.assertContains(response, "Fern AI Assistant")
+
+    def test_get_project_xml_by_id(self):
+        response = self.client.get(reverse("main:get_project_xml_by_id", kwargs={"project_id": self.project.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/xml")
+        self.assertContains(response, "Fern AI Assistant")
