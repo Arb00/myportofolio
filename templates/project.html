@@ -58,8 +58,12 @@
                                     Lihat proyek &rarr;
                                 </a>
                             {% endif %}
+                            <a href="{% url 'main:edit_project' project.id %}" class="btn btn-ghost button" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                                Edit
+                            </a>
                             {% include "components/project_delete_modal.html" with project=project %}
                         </div>
+
                     </div>
                 </article>
             {% empty %}

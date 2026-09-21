@@ -288,3 +288,24 @@ class ProjectTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/xml")
         self.assertContains(response, "Fern AI Assistant")
+
+    def test_edit_project_view_get(self):
+        response = self.client.get(reverse("main:edit_project", kwargs={"project_id": self.project.id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "projects_edit.html")
+        self.assertContains(response, self.project.title)
+
+    def test_edit_project_view_post_valid(self):
+        data = {
+            "title": "Fern AI Assistant Updated",
+            "description": "Updated description here.",
+            "tech_stack": "Django, Gemini API, PyTorch",
+            "project_url": "https://github.com/example/updated",
+            "project_image_url": "https://example.com/updated.png",
+        }
+        response = self.client.post(reverse("main:edit_project", kwargs={"project_id": self.project.id}), data=data)
+        self.assertEqual(response.status_code, 302)
+        self.project.refresh_from_db()
+        self.assertEqual(self.project.title, "Fern AI Assistant Updated")
+        self.assertEqual(self.project.tech_stack, "Django, Gemini API, PyTorch")
+
