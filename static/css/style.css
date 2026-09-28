@@ -9,179 +9,6 @@
   --ink-text: #1B1F1D;
   --paper-text: #EFE9DC;
   --amber: #C98A34;
-  --amber-bright: #E3A857;
-  --teal: #3E7C7C;
-  --line: #C9BFA5;
-  --line-dark: #3A4547;
-
-  /* Token tambahan — dipakai oleh kartu Experience & Education */
-  --accent-dark: var(--teal);
-  --text-muted: #6b6f65;
-  --radius: 10px;
-  --card-bg: #ffffff;
-  --shadow-sm: 0 1px 3px rgba(18, 24, 27, 0.08);
-  --shadow-md: 0 10px 24px rgba(18, 24, 27, 0.12);
-
-  --font-display: "Newsreader", Georgia, serif;
-  --font-body: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "IBM Plex Mono", "Courier New", monospace;
-
-  --content-width: 1080px;
-}
-
-.skip-link {
-  position: absolute;
-  left: 12px;
-  top: -48px;
-  background: var(--ink);
-  color: var(--paper-text);
-  padding: 10px 16px;
-  border-radius: 4px;
-  text-decoration: none;
-  z-index: 100;
-  transition: top 0.15s ease;
-}
-
-.skip-link:focus {
-  top: 12px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-}
-
-* { box-sizing: border-box; }
-
-html {
-  scroll-behavior: smooth;
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: var(--paper);
-  color: var(--ink-text);
-  font-family: var(--font-body);
-  font-size: 17px;
-  line-height: 1.6;
-  transition: background-color 0.25s ease, color 0.25s ease;
-}
-
-/* Footer selalu menempel di bawah viewport, walau konten halaman pendek
-   (misalnya halaman Education dengan sedikit data). */
-main {
-  flex: 1 0 auto;
-}
-
-.site-footer {
-  flex-shrink: 0;
-}
-
-/* ============================================================
-   CUSTOM SCROLLBAR (fitur ekstra murni CSS)
-   ============================================================ */
-html {
-  scrollbar-width: thin;
-  scrollbar-color: var(--line-dark) transparent;
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: var(--line-dark);
-  border-radius: 999px;
-  border: 2px solid var(--paper);
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--teal);
-}
-
-img { max-width: 100%; display: block; }
-
-a { color: inherit; }
-
-.wrap {
-  max-width: var(--content-width);
-  margin: 0 auto;
-  padding: 0 32px;
-}
-
-a:focus-visible,
-button:focus-visible {
-  outline: 2px solid var(--teal);
-  outline-offset: 3px;
-}
-
-/* ============================================================
-   HEADER
-   ============================================================ */
-.site-header {
-  background: var(--ink);
-  color: var(--paper-text);
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  border-bottom: 1px solid var(--line-dark);
-}
-
-.site-header .wrap {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 64px;
-}
-
-.brand {
-  font-family: var(--font-display);
-  font-size: 1.3rem;
-  font-style: italic;
-  text-decoration: none;
-  color: var(--paper-text);
-}
-
-.site-nav {
-  display: flex;
-  gap: 28px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.site-nav a {
-  text-decoration: none;
-  font-size: 0.95rem;
-  color: var(--paper-text);
-  opacity: 0.75;
-  transition: opacity 0.15s ease;
-  padding-bottom: 4px;
-  border-bottom: 1px solid transparent;
-}
-
-.site-nav a:hover {
-  opacity: 1;
-  border-bottom-color: var(--amber-bright);
-}
-
-/* ============================================================
-   HERO / PROFILE
-   ============================================================ */
-.hero {
-  min-height: calc(100vh - 64px);
-  display: flex;
-  align-items: center;
-  border-bottom: 1px solid var(--line);
-}
-
-.hero .wrap {
-  display: grid;
   grid-template-columns: 1.2fr 0.8fr;
   align-items: center;
   gap: 56px;
@@ -1390,5 +1217,26 @@ section.block {
         width: 100%;
         text-align: center;
     }
+}
+.star-form {
+    display: inline;
+}
+
+.button-star {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--ink);
+}
+
+.button-star.is-starred {
+    background: var(--accent);
+}
+
+.star-count {
+    padding: 0.05rem 0.4rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.25);
+    font-size: 0.8rem;
 }
 

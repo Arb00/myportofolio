@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from datetime import date
+from django.contrib.auth.models import User
 
 from main.models import Education, Experience, Project
 
@@ -308,4 +309,40 @@ class ProjectTest(TestCase):
         self.project.refresh_from_db()
         self.assertEqual(self.project.title, "Fern AI Assistant Updated")
         self.assertEqual(self.project.tech_stack, "Django, Gemini API, PyTorch")
+
+
+class LastLoginCookieTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="cookie_user",
+            password="Strong!Pass2468",
+        )
+
+    def test_login_sets_cookie_and_profile_displays_it(self):
+        response = self.client.post(
+            reverse("main:login"),
+            {"username": "cookie_user", "password": "Strong!Pass2468"},
+        )
+
+        self.assertRedirects(response, reverse("main:show_main"))
+        last_login = response.cookies["last_login"].value
+        self.assertRegex(last_login, r"^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$")
+
+        profile = self.client.get(reverse("main:show_main"))
+        self.assertContains(profile, "Sesi Terakhir Login")
+        self.assertContains(profile, last_login)
+
+    def test_profile_uses_fallback_when_cookie_is_missing(self):
+        response = self.client.get(reverse("main:show_main"))
+
+        self.assertContains(response, "Belum ada sesi login / Cookie tidak ditemukan")
+
+    def test_logout_deletes_last_login_cookie(self):
+        self.client.force_login(self.user)
+        self.client.cookies["last_login"] = "2026-09-28 10:00:00"
+
+        response = self.client.get(reverse("main:logout"))
+
+        self.assertRedirects(response, reverse("main:show_main"))
+        self.assertEqual(response.cookies["last_login"].value, "")
 
