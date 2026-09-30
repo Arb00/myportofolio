@@ -31,7 +31,9 @@
                     <button type="submit">Cari</button>
                 </div>
             </form>
-            <a class="btn btn-primary" href="{% url 'main:create_experience' %}">+ Tambah experience</a>
+            {% if perms.main.add_experience %}
+                <a class="btn btn-primary" href="{% url 'main:create_experience' %}">+ Tambah experience</a>
+            {% endif %}
         </div>
 
         <div class="experience-grid">
@@ -76,8 +78,19 @@
                     <span class="card-cta">Lihat detail &rarr;</span>
 
                     </a>
+                    <div class="project-actions">
+                        {% include "components/experience_star.html" with experience=experience %}
 
-                    {% include "components/experience_delete_modal.html" with experience=experience %}
+                        {% if perms.main.change_experience %}
+                            <a href="{% url 'main:edit_experience' experience.id %}" class="btn btn-ghost button" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                                Edit
+                            </a>
+                        {% endif %}
+
+                        {% if perms.main.delete_experience %}
+                            {% include "components/experience_delete_modal.html" with experience=experience %}
+                        {% endif %}
+                    </div>
                 </div>
 
             {% empty %}

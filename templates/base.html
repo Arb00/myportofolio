@@ -29,9 +29,10 @@
             {{ name }}
         </a>
 
-        <nav>
+        <nav class="site-nav" aria-label="Main navigation">
             <a href="{% url 'main:show_main' %}">Profile</a>
             <a href="{% url 'main:show_experience' %}">Experience</a>
+            <a href="{% url 'main:show_education' %}">Education</a>
             <a href="{% url 'main:show_projects' %}">Projects</a>
             {% if user.is_authenticated %}
                 <span class="nav-user">{{ user.username }}</span>
@@ -67,6 +68,6 @@
 
 <script src="{% static 'js/data.js' %}"></script>
 <script src="{% static 'js/script.js' %}"></script>
-
+{% include 'components/toast.html' %}
 </body>
 </html>
