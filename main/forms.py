@@ -22,6 +22,14 @@ class ExperienceForm(forms.ModelForm):
             "thumbnail": "URL Gambar / Thumbnail",
             "ended_at": "Tanggal Selesai (Kosongkan jika masih berlangsung)",
         }
+        widgets = {
+            "description": forms.Textarea(attrs={"rows": 4}),
+            # Input tanggal-waktu bawaan browser; format sesuai yang dikirim browser
+            "ended_at": forms.DateTimeInput(
+                attrs={"type": "datetime-local"},
+                format="%Y-%m-%dT%H:%M",
+            ),
+        }
 
     def clean_title(self):
         title = strip_tags(self.cleaned_data["title"]).strip()
