@@ -129,9 +129,40 @@ def _toggle_star(user, obj):
 # ---------- Experience ----------
 
 def get_experience_json(request):
-    qs, _ = _filter_by_title(request, Experience.objects.all())
-    return _serialize("json", qs, Experience)
-
+    """Data experience untuk AJAX, disusun manual dengan info star dari Tugas 4."""
+    experiences = (
+        Experience.objects
+        .annotate(star_count=Count("stars", distinct=True))
+        .order_by("-started_at")
+    )
+    experiences, _ = _filter_by_title(request, experiences)
+ 
+    # Ambil ID experience yang sudah di-star user ini dalam satu query
+    starred_ids = set()
+    if request.user.is_authenticated:
+        starred_ids = set(
+            request.user.starred_experiences.values_list("id", flat=True)
+        )
+ 
+    data = [
+        {
+            "pk": str(exp.id),
+            "fields": {
+                "title": exp.title,
+                "description": exp.description,
+                "category": exp.category,
+                "category_display": exp.get_category_display(),
+                "thumbnail": exp.thumbnail or "",
+                "started_at": exp.started_at.isoformat() if exp.started_at else None,
+                "ended_at": exp.ended_at.isoformat() if exp.ended_at else None,
+                "is_ongoing": exp.is_ongoing,
+                "star_count": exp.star_count,
+                "is_starred": exp.id in starred_ids,
+            },
+        }
+        for exp in experiences
+    ]
+    return JsonResponse(data, safe=False)
 
 def get_experience_xml(request):
     qs, _ = _filter_by_title(request, Experience.objects.all())
@@ -149,17 +180,10 @@ def get_experience_xml_by_id(request, experience_id):
 
 
 def show_experience(request):
-    if hasattr(Experience, "starred_by"):
-        qs = Experience.objects.annotate(star_count=Count("starred_by"))
-    elif hasattr(Experience, "stars"):
-        qs = Experience.objects.annotate(star_count=Count("stars"))
-    else:
-        qs = Experience.objects.all()
-    qs, title_query = _filter_by_title(request, qs)
+    """Hanya merender kerangka halaman; daftar diambil lewat fetch()."""
     context = {
         "name": "Muhammad Sabri",
-        "experience_list": qs,
-        "title_query": title_query,
+        "title_query": request.GET.get("title", "").strip(),
     }
     return render(request, "experience.html", context)
 
@@ -306,4 +330,23 @@ def create_project_ajax(request):
         project = form.save()
         return JsonResponse({"message": "Proyek berhasil ditambahkan.", "pk": str(project.id)}, status=201)
 
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
+    
+@require_POST
+def create_experience_ajax(request):
+    """Tambah experience lewat AJAX. Balas JSON: 201 sukses, 400 invalid, 403 tanpa izin.
+    Izin dicek di sini (bukan hanya menyembunyikan tombol) sesuai peran dari Tugas 4."""
+    if not request.user.has_perm("main.add_experience"):
+        return JsonResponse(
+            {"message": "Kamu tidak memiliki izin untuk menambahkan experience."},
+            status=403,
+        )
+ 
+    form = ExperienceForm(request.POST)
+    if form.is_valid():
+        experience = form.save()
+        return JsonResponse(
+            {"message": "Experience baru berhasil ditambahkan!", "pk": str(experience.id)},
+            status=201,
+        )
     return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
