@@ -69,7 +69,12 @@ note : experience akan dibuat jadi folder dan ditambahkan beberapa file html yan
 
 ---
 
-- chat antigravity : 
+- Log chat Antigravity (Tugas 3), disertakan sebagai log prompting:
+
+<details>
+<summary>Klik untuk melihat log chat</summary>
+
+```text
 Load older messages
 Conversation Log
 gw mau commit apa aja nih sarannya
@@ -212,7 +217,9 @@ gaskeun
 lanjut
 User cancelled agent execution.
 11:01 PM
+```
 
+</details>
 
 ### TUGAS 3 :
 ### 1. ModelForm dan CSRF Token
@@ -239,3 +246,24 @@ User cancelled agent execution.
 * **Urgensi Serialization:**
   * Objek model Django adalah objek Python kompleks di memori server yang tidak bisa ditransmisikan langsung melalui protokol HTTP.
   * Serialisasi mengonversi objek tersebut menjadi format teks standar (JSON) agar dapat diproses oleh *frontend* atau aplikasi klien.
+
+---
+
+### Tugas 5
+
+1. **Debouncing** adalah teknik menunda eksekusi sebuah fungsi sampai pengguna berhenti memicu event selama jeda tertentu. Pada fitur pencarian, setiap ketikan akan mereset timer (`clearTimeout`), dan request `fetch()` baru dikirim setelah pengguna berhenti mengetik selama 300 ms. Teknik ini penting karena tanpa debouncing setiap huruf yang diketik akan mengirim satu request ke server. Akibatnya server terbebani, bandwidth terbuang, dan hasil pencarian bisa tampil tidak berurutan karena respons dari request lama datang belakangan. Di halaman Experience saya juga memakai `AbortController` untuk membatalkan request lama yang belum selesai.
+
+2. **`await`** membuat fungsi `async` menunggu sampai Promise selesai (*resolved*) sebelum lanjut ke baris berikutnya. `fetch()` mengembalikan Promise, bukan langsung data. Dengan `await fetch(...)` kita mendapatkan objek `Response`, lalu `await response.json()` untuk mendapatkan datanya. Jika tidak memakai `await`, variabel hanya berisi Promise yang masih *pending*, sehingga misalnya `response.ok` bernilai `undefined` dan `data.length` tidak bisa dipakai. Kode setelahnya juga langsung berjalan sebelum data dari server tiba, dan error dari request tidak tertangkap oleh blok `try...catch`.
+
+3. **XSS (*Cross-Site Scripting*)** adalah serangan ketika penyerang menyisipkan kode berbahaya (biasanya JavaScript, misalnya `<img src="x" onerror="alert('XSS!')">`) ke dalam data yang kemudian ditampilkan dan dijalankan di browser pengguna lain. Kode itu bisa mencuri cookie/sesi atau mengubah tampilan halaman. Data yang ditampilkan lewat template Django lebih aman karena Django melakukan *auto-escaping* secara default: karakter seperti `<` dan `>` otomatis diubah menjadi `&lt;` dan `&gt;`. Sebaliknya, data yang disisipkan lewat JavaScript dengan `innerHTML` tidak di-escape otomatis, sehingga tag HTML di dalam data akan dirender dan dijalankan oleh browser. Karena itu saya melakukan dua lapis perlindungan: `escapeHtml()` pada setiap nilai teks di sisi klien, dan `strip_tags` pada method `clean_title`/`clean_description` di `ExperienceForm` dan `ProjectForm` di sisi server.
+
+**Implementasi Tugas 5 (bagian Experience):**
+* Halaman Experience hanya merender kerangka, lalu data diambil dari `/api/experience/` dengan `fetch()`. Ada kondisi loading, kosong, dan error.
+* `get_experience_json` menyusun JSON secara manual dengan `JsonResponse`, termasuk `star_count` dan `is_starred` untuk pengguna yang sedang login.
+* Pencarian berdasarkan judul dengan debouncing 300 ms tanpa reload halaman.
+* Form tambah experience di dalam modal (popover), dikirim ke view `create_experience_ajax` dengan header `X-CSRFToken`. View memeriksa izin `main.add_experience` di sisi server dan membalas 201 (berhasil), 400 (validasi gagal), atau 403 (tidak punya izin).
+* Toast muncul saat data berhasil ditambahkan dan saat gagal, termasuk pesan validasi dari server.
+* Perbaikan bug: `ProjectForm` sebelumnya terdefinisi dua kali sehingga `strip_tags` tidak berjalan, dan template modal/komponen yang hilang sudah ditambahkan.
+
+**AI Disclosure Tugas 5:**
+- Claude (claude.ai): Saya menggunakan Claude untuk mengecek kode saya terhadap checklist Tugas 5. Claude menemukan beberapa bug (template `project_form_modal.html` yang belum ada, `ProjectForm` yang terdefinisi dua kali, dan include komponen experience yang hilang). Claude juga membantu membuat draf kode AJAX untuk halaman Experience (`experience.html`, `experience_form_modal.html`, view `get_experience_json` dan `create_experience_ajax`, serta `clean_*` di `ExperienceForm`) dan draf jawaban pertanyaan reflektif. Strategi prompting saya adalah mengerjakan checklist satu per satu dan meminta hasilnya dalam bentuk file yang saya salin sendiri ke proyek. Setelah itu saya menguji sendiri di browser sebagai pengunjung, user biasa, dan superuser, termasuk mencoba input XSS.
