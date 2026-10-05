@@ -32,7 +32,9 @@
                 </div>
             </form>
             {% if perms.main.add_experience %}
-                <a class="btn btn-primary" href="{% url 'main:create_experience' %}">+ Tambah experience</a>
+                <button type="button" class="button btn btn-primary" popovertarget="add-experience-modal">
+                    <span aria-hidden="true">+</span> Tambah experience
+                </button>
             {% endif %}
         </div>
 
@@ -48,6 +50,10 @@
 
 </section>
 
+{% if perms.main.add_experience %}
+    {% include "components/experience_form_modal.html" %}
+{% endif %}
+
 <script>
     const EXPERIENCE_ENDPOINT = "{% url 'main:get_experience_json' %}";
     const UUID_PLACEHOLDER = "00000000-0000-0000-0000-000000000000";
@@ -59,6 +65,9 @@
     const CAN_CHANGE = "{{ perms.main.change_experience|yesno:'true,false' }}" === "true";
     const CAN_DELETE = "{{ perms.main.delete_experience|yesno:'true,false' }}" === "true";
     const LOGIN_URL = "{% url 'main:login' %}";
+    const CREATE_EXPERIENCE_ENDPOINT = "{% url 'main:create_experience_ajax' %}";
+    const SEARCH_DEBOUNCE_DELAY = 300;
+    let searchDebounceTimer;
 
     const experienceLoading = document.getElementById('experience-loading');
     const experienceError = document.getElementById('experience-error');
@@ -67,6 +76,9 @@
     const experienceGrid = document.getElementById('experience-grid');
     const experienceSearchForm = document.getElementById('experience-search-form');
     const experienceSearchInput = document.getElementById('experience-search-input');
+    // Modal hanya dirender untuk pengguna dengan izin tambah, jadi bisa bernilai null
+    const experienceForm = document.getElementById('experience-form');
+    const experienceModal = document.getElementById('add-experience-modal');
     let experienceAbortController;
 
     // Escape setiap teks sebelum disisipkan ke HTML untuk mencegah XSS
@@ -77,6 +89,18 @@
             .replaceAll('>', '&gt;')
             .replaceAll('"', '&quot;')
             .replaceAll("'", '&#39;');
+    }
+
+    // Ambil token CSRF dari cookie untuk header X-CSRFToken
+    function getCookie(name) {
+        const cookies = document.cookie ? document.cookie.split(';') : [];
+        for (const cookie of cookies) {
+            const trimmed = cookie.trim();
+            if (trimmed.startsWith(name + '=')) {
+                return decodeURIComponent(trimmed.substring(name.length + 1));
+            }
+        }
+        return null;
     }
 
     function urlFor(template, id) {
@@ -193,10 +217,57 @@
         }
     }
 
+    // Debouncing: request baru dikirim setelah pengguna berhenti mengetik selama 300 ms
+    experienceSearchInput.addEventListener('input', function () {
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(function () {
+            fetchExperiences(experienceSearchInput.value.trim());
+        }, SEARCH_DEBOUNCE_DELAY);
+    });
+
     experienceSearchForm.addEventListener('submit', function (event) {
         event.preventDefault();
+        clearTimeout(searchDebounceTimer);
         fetchExperiences(experienceSearchInput.value.trim());
     });
+
+    // Kirim form modal dengan Fetch API, lalu perbarui daftar tanpa reload
+    async function addExperience(event) {
+        event.preventDefault();
+        const submitButton = experienceForm.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+
+        try {
+            const response = await fetch(CREATE_EXPERIENCE_ENDPOINT, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': getCookie('csrftoken') },
+                body: new FormData(experienceForm),
+            });
+            const result = await response.json().catch(() => ({}));
+
+            if (response.status === 201) {
+                experienceForm.reset();
+                experienceModal.hidePopover();
+                showToast('Berhasil', result.message || 'Experience baru berhasil ditambahkan!', 'success');
+                fetchExperiences(experienceSearchInput.value.trim());
+            } else {
+                // 400: pesan validasi per field dari ModelForm; 403: tidak punya izin
+                const errorMessages = result.errors
+                    ? Object.values(result.errors).flat().map(error => error.message)
+                    : [result.message || `Terjadi kesalahan (status ${response.status}).`];
+                showToast('Gagal menambahkan experience', errorMessages.join(' '), 'error');
+            }
+        } catch (error) {
+            console.error('Error adding experience:', error);
+            showToast('Gagal menambahkan experience', 'Tidak dapat terhubung ke server. Silakan coba lagi.', 'error');
+        } finally {
+            submitButton.disabled = false;
+        }
+    }
+
+    if (experienceForm) {
+        experienceForm.addEventListener('submit', addExperience);
+    }
 
     // Ambil data pertama kali saat halaman dimuat
     fetchExperiences(experienceSearchInput.value.trim());

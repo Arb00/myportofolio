@@ -184,6 +184,7 @@ def show_experience(request):
     context = {
         "name": "Muhammad Sabri",
         "title_query": request.GET.get("title", "").strip(),
+        "form": ExperienceForm(),
     }
     return render(request, "experience.html", context)
 
@@ -331,7 +332,7 @@ def create_project_ajax(request):
         return JsonResponse({"message": "Proyek berhasil ditambahkan.", "pk": str(project.id)}, status=201)
 
     return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
-    
+
 @require_POST
 def create_experience_ajax(request):
     """Tambah experience lewat AJAX. Balas JSON: 201 sukses, 400 invalid, 403 tanpa izin.
