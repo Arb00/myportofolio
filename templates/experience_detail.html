@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {{ experience.title }} - {{ name }}
+{% endblock %}
+
+{% block content %}
+
+<section class="detail-section">
+
+    <div class="wrap">
+
+        <a class="back-link" href="{% url 'main:show_experience' %}">
+            &larr; Kembali ke Experience
+        </a>
+
+        {% if experience.thumbnail %}
+            <img class="detail-logo" src="{{ experience.thumbnail }}" alt="" loading="lazy">
+        {% endif %}
+
+        <span class="experience-category">
+            {{ experience.get_category_display }}
+        </span>
+
+        <h1>
+            {{ experience.title }}
+        </h1>
+
+        {% if experience.is_ongoing %}
+            <p class="experience-status" data-ongoing="true">
+                Sedang berlangsung
+            </p>
+        {% else %}
+            <p class="experience-status" data-ongoing="false">
+                Selesai
+            </p>
+        {% endif %}
+
+        <p class="detail-body">
+            {{ experience.description }}
+        </p>
+
+    </div>
+
+</section>
+
+{% endblock %}

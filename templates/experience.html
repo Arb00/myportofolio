@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Experience - {{ name }}
+{% endblock %}
+
+{% block content %}
+
+<section class="experience-section">
+
+    <div class="wrap">
+
+        <p class="section-kicker">
+            Perjalanan saya sejauh ini
+        </p>
+
+        <h1>Experience</h1>
+
+        {% if messages %}
+            {% for message in messages %}
+                <p class="message message-{{ message.tags }}" role="status">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <div class="experience-toolbar">
+            <form class="experience-search" method="GET">
+                <label for="title">Cari experience</label>
+                <div class="experience-search__controls">
+                    <input id="title" type="search" name="title" value="{{ title_query }}" placeholder="Cari berdasarkan judul">
+                    <button type="submit">Cari</button>
+                </div>
+            </form>
+            {% if perms.main.add_experience %}
+                <a class="btn btn-primary" href="{% url 'main:create_experience' %}">+ Tambah experience</a>
+            {% endif %}
+        </div>
+
+        <div class="experience-grid">
+
+            {% for experience in experience_list %}
+
+                <div class="experience-item">
+                    <a class="experience-card" href="{% url 'main:show_experience_detail' experience.id %}">
+
+                    <div class="card-top">
+                        <span class="experience-category">
+                            {{ experience.get_category_display }}
+                        </span>
+
+                        {% if experience.thumbnail %}
+                            <img class="card-logo" src="{{ experience.thumbnail }}" alt="" loading="lazy">
+                        {% endif %}
+                    </div>
+
+                    <h2>
+                        {{ experience.title }}
+                    </h2>
+
+                    <p class="experience-description">
+                        {{ experience.description }}
+                    </p>
+
+                    {% if experience.is_ongoing %}
+
+                        <p class="experience-status" data-ongoing="true">
+                            Sedang berlangsung
+                        </p>
+
+                    {% else %}
+
+                        <p class="experience-status" data-ongoing="false">
+                            Selesai
+                        </p>
+
+                    {% endif %}
+
+                    <span class="card-cta">Lihat detail &rarr;</span>
+
+                    </a>
+                    <div class="project-actions">
+                        {% include "components/experience_star.html" with experience=experience %}
+
+                        {% if perms.main.change_experience %}
+                            <a href="{% url 'main:edit_experience' experience.id %}" class="btn btn-ghost button">
+                                Edit
+                            </a>
+                        {% endif %}
+
+                        {% if perms.main.delete_experience %}
+                            {% include "components/experience_delete_modal.html" with experience=experience %}
+                        {% endif %}
+                    </div>
+                </div>
+
+            {% empty %}
+
+                <p class="empty-state">
+                    {% if title_query %}
+                        Tidak ada experience dengan judul tersebut.
+                    {% else %}
+                        Belum ada pengalaman yang ditambahkan.
+                    {% endif %}
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

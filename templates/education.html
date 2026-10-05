@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Education - {{ name }}
+{% endblock %}
+
+{% block content %}
+
+<section class="education-section">
+
+    <div class="wrap">
+
+        <p class="section-kicker">
+            Perjalanan pendidikan saya
+        </p>
+
+        <h1>Education</h1>
+
+        <div class="education-grid">
+
+            {% for education in education_list %}
+
+                <article class="education-card">
+
+                    <div class="card-top">
+                        <span class="education-level">
+                            {{ education.get_level_display }}
+                        </span>
+
+                        {% if education.logo %}
+                            <img class="card-logo" src="{{ education.logo }}" alt="" loading="lazy">
+                        {% endif %}
+                    </div>
+
+                    {% if education.website %}
+                        <h2>
+                            <a class="education-link"
+                               href="{{ education.website }}"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                {{ education.institution }}
+                            </a>
+                        </h2>
+                    {% else %}
+                        <h2>
+                            {{ education.institution }}
+                        </h2>
+                    {% endif %}
+
+                    {% if education.field_of_study %}
+                        <p class="education-field">
+                            {{ education.field_of_study }}
+                        </p>
+                    {% endif %}
+
+                    {% if education.description %}
+                        <p class="education-description">
+                            {{ education.description }}
+                        </p>
+                    {% endif %}
+
+                    {% if education.ended_at %}
+
+                        <p class="education-status" data-ongoing="false">
+                            Selesai
+                        </p>
+
+                    {% else %}
+
+                        <p class="education-status" data-ongoing="true">
+                            Sedang berlangsung
+                        </p>
+
+                    {% endif %}
+
+                </article>
+
+            {% empty %}
+
+                <p class="empty-state">
+                    Belum ada pendidikan yang ditambahkan.
+                </p>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
