@@ -26,6 +26,7 @@ from main.views import (
     show_projects,
     toggle_experience_star,
     toggle_star,
+    create_experience_ajax,
 )
 
 app_name = "main"
@@ -47,6 +48,7 @@ urlpatterns = [
     path("api/experience/xml/", get_experience_xml, name="get_experience_xml"),
     path("api/experience/<uuid:experience_id>/", get_experience_json_by_id, name="get_experience_json_by_id"),
     path("api/experience/xml/<uuid:experience_id>/", get_experience_xml_by_id, name="get_experience_xml_by_id"),
+    path("experience/add-ajax/", create_experience_ajax, name="create_experience_ajax"),
 
     # Education
     path("education/", show_education, name="show_education"),
