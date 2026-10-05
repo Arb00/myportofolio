@@ -18,6 +18,7 @@ from main.views import (
     login_user,
     logout_user,
     register,
+    show_projects,
     show_education,
     show_experience,
     show_experience_detail,

@@ -82,7 +82,7 @@
                         {% include "components/experience_star.html" with experience=experience %}
 
                         {% if perms.main.change_experience %}
-                            <a href="{% url 'main:edit_experience' experience.id %}" class="btn btn-ghost button" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                            <a href="{% url 'main:edit_experience' experience.id %}" class="btn btn-ghost button">
                                 Edit
                             </a>
                         {% endif %}
