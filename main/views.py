@@ -276,17 +276,6 @@ def create_experience(request):
     return render(request, "experience_form.html", {"name": "Muhammad Sabri", "form": form})
 
 
-@perm_required("main.change_experience")
-def edit_experience(request, experience_id):
-    experience = get_object_or_404(Experience, pk=experience_id)
-    form = ExperienceForm(request.POST or None, instance=experience)
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Pengalaman berhasil diperbarui!")
-        return redirect("main:show_experience")
-    return render(request, "experience_form.html", {"name": "Muhammad Sabri", "form": form})
-
-
 @perm_required("main.delete_experience")
 @require_POST
 def delete_experience(request, experience_id):
@@ -348,7 +337,7 @@ def get_project_xml_by_id(request, project_id):
 def show_projects(request):
     title_query = request.GET.get("title", "").strip()
     context = {
-        "name": "Sabri", # Sesuaikan dengan namamu
+        "name": "Muhammad Sabri",
         "title_query": title_query,
         "form": ProjectForm(),
     }
@@ -377,18 +366,6 @@ def create_project(request):
         messages.success(request, "Proyek baru berhasil ditambahkan!")
         return redirect("main:show_projects")
     return render(request, "projects_form.html", {"name": "Muhammad Sabri", "form": form})
-
-
-@perm_required("main.change_project")
-def edit_project(request, project_id):
-    project = get_object_or_404(Project, pk=project_id)
-    form = ProjectForm(request.POST or None, instance=project)
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Proyek berhasil diperbarui!")
-        return redirect("main:show_projects")
-    context = {"name": "Muhammad Sabri", "form": form, "project": project}
-    return render(request, "projects_edit.html", context)
 
 
 @perm_required("main.delete_project")
