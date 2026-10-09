@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 from pathlib import Path
 import os
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
@@ -23,17 +24,33 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
+PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2gk5b&s+qiwrpf6q((9sn^&9v_mzgp0&&ypyfabo0*7lk)id0n'
+# Di production SECRET_KEY wajib diset lewat environment variable
+SECRET_KEY = os.getenv('SECRET_KEY')
+if not SECRET_KEY:
+    if PRODUCTION:
+        raise ImproperlyConfigured('SECRET_KEY harus diset di environment saat PRODUCTION=true')
+    # Kunci cadangan khusus development/test, jangan dipakai di production
+    SECRET_KEY = 'django-insecure-dev-only-key-jangan-dipakai-di-production'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Default: True di development, False di production
+DEBUG = os.getenv('DEBUG', str(not PRODUCTION)).lower() == 'true'
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "muhammad-sabri51-myportofolio.pws.cs.ui.ac.id"]
 
 CSRF_TRUSTED_ORIGINS = ["https://muhammad-sabri51-myportofolio.pws.cs.ui.ac.id"]
 
-PRODUCTION = os.getenv('PRODUCTION', 'False').lower() == 'true'
+# Pengaturan keamanan yang hanya aktif di production
+if PRODUCTION:
+    # PWS berada di belakang reverse proxy, jadi skema asli dibaca dari header ini
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'True').lower() == 'true'
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = int(os.getenv('SECURE_HSTS_SECONDS', '3600'))
 
 
 # Application definition
