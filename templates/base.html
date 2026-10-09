@@ -5,13 +5,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="light">
 
     <title>
         {% block title %}
             {{ name }} - Portofolio
         {% endblock %}
     </title>
+
+    <meta name="description" content="{% block meta_description %}Portofolio {{ name }}, mahasiswa Ilmu Komputer Universitas Indonesia: pengalaman, pendidikan, dan proyek.{% endblock %}">
+
+    <!-- Open Graph: pratinjau saat tautan dibagikan -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ name }} - Portofolio">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:title" content="{% block og_title %}{{ name }} - Portofolio{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Portofolio {{ name }}, mahasiswa Ilmu Komputer Universitas Indonesia: pengalaman, pendidikan, dan proyek.{% endblock %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/MuhammadSabri_Staff_DSA.webp' %}">
+    <meta name="twitter:card" content="summary">
+
+    <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+
+    <script>
+        // Terapkan tema sebelum halaman digambar supaya tidak berkedip:
+        // pilihan tersimpan di localStorage, kalau belum ada ikuti prefers-color-scheme
+        (function () {
+            var stored = null;
+            try { stored = localStorage.getItem('theme'); } catch (error) {}
+            var dark = stored
+                ? stored === 'dark'
+                : window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.dataset.mode = dark ? 'dark' : 'light';
+        })();
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,7 +57,7 @@
             {{ name }}
         </a>
 
-        <nav class="site-nav" aria-label="Main navigation">
+        <nav class="site-nav" aria-label="Navigasi utama">
             <a href="{% url 'main:show_main' %}"{% if request.resolver_match.url_name == 'show_main' %} aria-current="page"{% endif %}>Profile</a>
             <a href="{% url 'main:show_experience' %}"{% if 'experience' in request.resolver_match.url_name %} aria-current="page"{% endif %}>Experience</a>
             <a href="{% url 'main:show_education' %}"{% if request.resolver_match.url_name == 'show_education' %} aria-current="page"{% endif %}>Education</a>
@@ -43,6 +69,7 @@
                 <a href="{% url 'main:login' %}">Login</a>
                 <a href="{% url 'main:register' %}">Register</a>
             {% endif %}
+            <button type="button" id="theme-toggle" class="theme-toggle" aria-pressed="false">Mode gelap</button>
         </nav>
 
 
@@ -50,7 +77,7 @@
 </header>
 
 
-<main id="top">
+<main id="top" tabindex="-1">
 
     {% block content %}
     {% endblock %}
@@ -64,6 +91,10 @@
             &copy; 2026 {{ name }}.
             Fakultas Ilmu Komputer, Universitas Indonesia.
         </p>
+        <nav class="footer-links" aria-label="Tautan sosial">
+            <a href="https://www.linkedin.com/in/muhammadsabri67/" target="_blank" rel="noopener noreferrer">LinkedIn<span class="visually-hidden"> (tab baru)</span></a>
+            <a href="https://github.com/Arb00/" target="_blank" rel="noopener noreferrer">GitHub<span class="visually-hidden"> (tab baru)</span></a>
+        </nav>
     </div>
 </footer>
 

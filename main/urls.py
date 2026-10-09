@@ -27,6 +27,12 @@ from main.views import (
     toggle_experience_star,
     toggle_star,
     create_experience_ajax,
+    delete_experience_ajax,
+    delete_project_ajax,
+    edit_experience_ajax,
+    edit_project_ajax,
+    send_message_ajax,
+    show_project_detail,
 )
 
 app_name = "main"
@@ -36,6 +42,7 @@ urlpatterns = [
     path("register/", register, name="register"),
     path("login/", login_user, name="login"),
     path("logout/", logout_user, name="logout"),
+    path("contact/send-ajax/", send_message_ajax, name="send_message_ajax"),
 
     # Experience
     path("experience/", show_experience, name="show_experience"),
@@ -49,6 +56,8 @@ urlpatterns = [
     path("api/experience/<uuid:experience_id>/", get_experience_json_by_id, name="get_experience_json_by_id"),
     path("api/experience/xml/<uuid:experience_id>/", get_experience_xml_by_id, name="get_experience_xml_by_id"),
     path("experience/add-ajax/", create_experience_ajax, name="create_experience_ajax"),
+    path("experience/<uuid:experience_id>/edit-ajax/", edit_experience_ajax, name="edit_experience_ajax"),
+    path("experience/<uuid:experience_id>/delete-ajax/", delete_experience_ajax, name="delete_experience_ajax"),
 
     # Education
     path("education/", show_education, name="show_education"),
@@ -56,6 +65,7 @@ urlpatterns = [
     # Projects
     path("projects/", show_projects, name="show_projects"),
     path("projects/add/", create_project, name="create_project"),
+    path("projects/<uuid:project_id>/", show_project_detail, name="show_project_detail"),
     path("projects/<uuid:project_id>/edit/", edit_project, name="edit_project"),
     path("projects/<uuid:project_id>/delete/", delete_project, name="delete_project"),
     path("projects/<uuid:project_id>/star/", toggle_star, name="toggle_star"),
@@ -64,4 +74,6 @@ urlpatterns = [
     path("api/projects/<uuid:project_id>/", get_project_json_by_id, name="get_project_json_by_id"),
     path("api/projects/xml/<uuid:project_id>/", get_project_xml_by_id, name="get_project_xml_by_id"),
     path("projects/add-ajax/", create_project_ajax, name="create_project_ajax"),
+    path("projects/<uuid:project_id>/edit-ajax/", edit_project_ajax, name="edit_project_ajax"),
+    path("projects/<uuid:project_id>/delete-ajax/", delete_project_ajax, name="delete_project_ajax"),
 ]

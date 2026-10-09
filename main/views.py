@@ -3,13 +3,28 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.staticfiles import finders
 from django.core import serializers
+from django.core.cache import cache
+from django.core.paginator import Paginator
 from django.db.models import Count
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.templatetags.static import static
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
-from main.forms import ExperienceForm, ProjectForm
-from main.models import Education, Experience, Project
+from main.forms import ExperienceForm, MessageForm, ProjectForm
+from main.models import Education, Experience, Project, Skill
+
+# Jumlah kartu per halaman untuk "muat lebih banyak" di daftar Experience dan Projects
+PAGE_SIZE = 6
+
+# File CV opsional; tombol Download CV hanya muncul kalau file ini ada di static/
+CV_STATIC_PATH = "files/CV_Muhammad_Sabri.pdf"
+
+# Rate limit form Contact: maksimal 3 pesan per 10 menit untuk tiap alamat IP
+CONTACT_RATE_LIMIT = 3
+CONTACT_RATE_WINDOW = 600
 
 
 def register(request):
@@ -66,8 +81,38 @@ def show_main(request):
             "pada pengembangan perangkat lunak dan pendidikan."
         ),
         "last_login": last_login,
+        "skills": Skill.objects.all(),
+        "contact_form": MessageForm(),
+        "cv_url": static(CV_STATIC_PATH) if finders.find(CV_STATIC_PATH) else None,
     }
     return render(request, "index.html", context)
+
+
+def _client_ip(request):
+    """Di belakang reverse proxy, alamat pengunjung ada di X-Forwarded-For."""
+    forwarded = request.META.get("HTTP_X_FORWARDED_FOR", "")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.META.get("REMOTE_ADDR", "")
+
+
+@require_POST
+def send_message_ajax(request):
+    """Simpan pesan dari form Contact. Balas JSON: 201 sukses, 400 invalid, 429 terlalu sering."""
+    cache_key = f"contact-rate:{_client_ip(request)}"
+    sent_count = cache.get(cache_key, 0)
+    if sent_count >= CONTACT_RATE_LIMIT:
+        return JsonResponse(
+            {"message": "Terlalu banyak pesan. Coba lagi beberapa menit lagi."},
+            status=429,
+        )
+
+    form = MessageForm(request.POST)
+    if form.is_valid():
+        form.save()
+        cache.set(cache_key, sent_count + 1, CONTACT_RATE_WINDOW)
+        return JsonResponse({"message": "Pesan berhasil dikirim. Terima kasih!"}, status=201)
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 
 def show_education(request):
@@ -115,6 +160,30 @@ def _star_relation(obj):
     return None
 
 
+def _paginated_json(request, queryset, to_dict):
+    """Tanpa ?page: seluruh data sebagai list (bentuk lama, tetap didukung).
+    Dengan ?page=N: objek berisi results, page, dan has_next untuk "muat lebih banyak"."""
+    if "page" not in request.GET:
+        return JsonResponse([to_dict(obj) for obj in queryset], safe=False)
+
+    page = Paginator(queryset, PAGE_SIZE).get_page(request.GET.get("page"))
+    return JsonResponse({
+        "results": [to_dict(obj) for obj in page.object_list],
+        "page": page.number,
+        "has_next": page.has_next(),
+    })
+
+
+def _redirect_back(request, fallback):
+    """Kembali ke halaman asal (field next) kalau URL-nya aman, selain itu ke fallback."""
+    next_url = request.POST.get("next", "")
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+    ):
+        return redirect(next_url)
+    return redirect(fallback)
+
+
 def _toggle_star(user, obj):
     """Beri star jika belum, batalkan jika sudah (maksimal 1 per user)."""
     relation = _star_relation(obj)
@@ -133,19 +202,19 @@ def get_experience_json(request):
     experiences = (
         Experience.objects
         .annotate(star_count=Count("stars", distinct=True))
-        .order_by("-started_at")
+        .order_by("-started_at", "id")
     )
     experiences, _ = _filter_by_title(request, experiences)
- 
+
     # Ambil ID experience yang sudah di-star user ini dalam satu query
     starred_ids = set()
     if request.user.is_authenticated:
         starred_ids = set(
             request.user.starred_experiences.values_list("id", flat=True)
         )
- 
-    data = [
-        {
+
+    def to_dict(exp):
+        return {
             "pk": str(exp.id),
             "fields": {
                 "title": exp.title,
@@ -160,9 +229,9 @@ def get_experience_json(request):
                 "is_starred": exp.id in starred_ids,
             },
         }
-        for exp in experiences
-    ]
-    return JsonResponse(data, safe=False)
+
+    return _paginated_json(request, experiences, to_dict)
+
 
 def get_experience_xml(request):
     qs, _ = _filter_by_title(request, Experience.objects.all())
@@ -230,23 +299,21 @@ def delete_experience(request, experience_id):
 @require_POST
 def toggle_experience_star(request, experience_id):
     _toggle_star(request.user, get_object_or_404(Experience, pk=experience_id))
-    return redirect("main:show_experience")
+    return _redirect_back(request, "main:show_experience")
 
 
 # ---------- Project ----------
 
 def get_projects_json(request):
-    title_query = request.GET.get("title", "").strip()
-    projects = Project.objects.prefetch_related('starred_by').all()
-    if title_query:
-        projects = projects.filter(title__icontains=title_query)
+    # Diurutkan supaya pembagian halaman konsisten (Project tidak punya tanggal dibuat)
+    projects = Project.objects.prefetch_related('starred_by').order_by("title", "id")
+    projects, _ = _filter_by_title(request, projects)
 
-    data = []
-    for project in projects:
+    def to_dict(project):
         starred_users = project.starred_by.all()
         is_starred = request.user in starred_users if request.user.is_authenticated else False
         starred_by_names = ", ".join([u.username for u in starred_users])
-        data.append({
+        return {
             "pk": str(project.id),
             "fields": {
                 "title": project.title,
@@ -254,12 +321,14 @@ def get_projects_json(request):
                 "tech_stack": project.tech_stack,
                 "project_url": project.project_url,
                 "project_image_url": project.project_image_url,
-                "star_count": starred_users.count(),
+                "star_count": len(starred_users),
                 "is_starred": is_starred,
                 "starred_by_names": starred_by_names,
             }
-        })
-    return JsonResponse(data, safe=False)
+        }
+
+    return _paginated_json(request, projects, to_dict)
+
 
 def get_projects_xml(request):
     qs, _ = _filter_by_title(request, Project.objects.all())
@@ -284,6 +353,21 @@ def show_projects(request):
         "form": ProjectForm(),
     }
     return render(request, "project.html", context)
+
+
+def show_project_detail(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    context = {
+        "name": "Muhammad Sabri",
+        "project": project,
+        "tech_list": [tech.strip() for tech in project.tech_stack.split(",") if tech.strip()],
+        "star_count": project.starred_by.count(),
+        "is_starred": (
+            request.user.is_authenticated
+            and project.starred_by.filter(pk=request.user.pk).exists()
+        ),
+    }
+    return render(request, "project_detail.html", context)
 
 @perm_required("main.add_project")
 def create_project(request):
@@ -319,35 +403,77 @@ def delete_project(request, project_id):
 @require_POST
 def toggle_star(request, project_id):
     _toggle_star(request.user, get_object_or_404(Project, pk=project_id))
-    return redirect("main:show_projects")
+    return _redirect_back(request, "main:show_projects")
+
+# ---------- AJAX: tambah, edit, hapus ----------
+# Izin dicek di dalam view (bukan hanya menyembunyikan tombol) dan balasan selalu JSON:
+# 200/201 sukses, 400 form invalid, 403 tanpa izin, 404 data tidak ditemukan.
+
+def _json_message(message, status):
+    return JsonResponse({"message": message}, status=status)
+
+
+def _save_form_ajax(form, success_message, status):
+    if form.is_valid():
+        obj = form.save()
+        return JsonResponse({"message": success_message, "pk": str(obj.id)}, status=status)
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
+
 
 @require_POST
 def create_project_ajax(request):
-    if not request.user.is_superuser:
-        return JsonResponse({"message": "Hanya pemilik portofolio yang dapat menambahkan proyek."}, status=403)
+    if not request.user.has_perm("main.add_project"):
+        return _json_message("Hanya pemilik portofolio yang dapat menambahkan proyek.", 403)
+    return _save_form_ajax(ProjectForm(request.POST), "Proyek berhasil ditambahkan.", 201)
 
-    form = ProjectForm(request.POST)
-    if form.is_valid():
-        project = form.save()
-        return JsonResponse({"message": "Proyek berhasil ditambahkan.", "pk": str(project.id)}, status=201)
 
-    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
+@require_POST
+def edit_project_ajax(request, project_id):
+    if not request.user.has_perm("main.change_project"):
+        return _json_message("Kamu tidak memiliki izin untuk mengubah proyek.", 403)
+    project = Project.objects.filter(pk=project_id).first()
+    if project is None:
+        return _json_message("Proyek tidak ditemukan.", 404)
+    form = ProjectForm(request.POST, instance=project)
+    return _save_form_ajax(form, "Proyek berhasil diperbarui.", 200)
+
+
+@require_POST
+def delete_project_ajax(request, project_id):
+    if not request.user.has_perm("main.delete_project"):
+        return _json_message("Kamu tidak memiliki izin untuk menghapus proyek.", 403)
+    project = Project.objects.filter(pk=project_id).first()
+    if project is None:
+        return _json_message("Proyek tidak ditemukan.", 404)
+    project.delete()
+    return _json_message("Proyek berhasil dihapus.", 200)
+
 
 @require_POST
 def create_experience_ajax(request):
-    """Tambah experience lewat AJAX. Balas JSON: 201 sukses, 400 invalid, 403 tanpa izin.
-    Izin dicek di sini (bukan hanya menyembunyikan tombol) sesuai peran dari Tugas 4."""
     if not request.user.has_perm("main.add_experience"):
-        return JsonResponse(
-            {"message": "Kamu tidak memiliki izin untuk menambahkan experience."},
-            status=403,
-        )
- 
+        return _json_message("Kamu tidak memiliki izin untuk menambahkan experience.", 403)
     form = ExperienceForm(request.POST)
-    if form.is_valid():
-        experience = form.save()
-        return JsonResponse(
-            {"message": "Experience baru berhasil ditambahkan!", "pk": str(experience.id)},
-            status=201,
-        )
-    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
+    return _save_form_ajax(form, "Experience baru berhasil ditambahkan!", 201)
+
+
+@require_POST
+def edit_experience_ajax(request, experience_id):
+    if not request.user.has_perm("main.change_experience"):
+        return _json_message("Kamu tidak memiliki izin untuk mengubah experience.", 403)
+    experience = Experience.objects.filter(pk=experience_id).first()
+    if experience is None:
+        return _json_message("Experience tidak ditemukan.", 404)
+    form = ExperienceForm(request.POST, instance=experience)
+    return _save_form_ajax(form, "Experience berhasil diperbarui!", 200)
+
+
+@require_POST
+def delete_experience_ajax(request, experience_id):
+    if not request.user.has_perm("main.delete_experience"):
+        return _json_message("Kamu tidak memiliki izin untuk menghapus experience.", 403)
+    experience = Experience.objects.filter(pk=experience_id).first()
+    if experience is None:
+        return _json_message("Experience tidak ditemukan.", 404)
+    experience.delete()
+    return _json_message("Experience berhasil dihapus!", 200)

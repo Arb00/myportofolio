@@ -68,27 +68,37 @@ const HOBBIES = [
   {
     title: "Basket",
     caption: "Dulu rajin banget main basket. Kulit sampe gosong. Kata my kakak 'kok item banget'. Sekarang udah ga pernah main lagi",
-    image: "/static/img/basket1.jpeg"
+    image: "/static/img/basket1.jpeg",
+    width: 1600,
+    height: 1066
   },
   {
     title: "Mancing",
     caption: "Awalnya coba-coba eh kok asik. Btw itu ikan pertama gweh. Diajakan temen mancing. Otw jadi Angler sejati.",
-    image: "/static/img/Mancing.jpeg"
+    image: "/static/img/Mancing.jpeg",
+    width: 960,
+    height: 1280
   },
   {
     title: "Sunset di pantai",
     caption: "Sesering itu ke pantai kalo lagi di Aceh. gpp nonton Spiderman & Odyssey nya telat ada sunset yang temenin disini (Aceh ga bioskop)",
-    image: "/static/img/sunset1.jpeg"
+    image: "/static/img/sunset1.webp",
+    width: 1200,
+    height: 1063
   },
   {
     title: "Vibe Coding",
     caption: "Masih belajar aja. Kalo codenya jalan seneng banget. Makin sering ngoding karena pacil",
-    image: "/static/img/hengker.jpeg"
+    image: "/static/img/hengker.webp",
+    width: 1200,
+    height: 1600
   },
   {
     title: "Baking",
     caption: "Masih pemula. Tapi bolu pisang gweh enak kok. Nanti kalo disini udah ada oven gw bawain ke pacil deh.",
-    image: "/static/img/bolupisang.jpeg"
+    image: "/static/img/bolupisang.jpeg",
+    width: 720,
+    height: 1280
   }
 ];
 
@@ -98,6 +108,8 @@ const EDUCATION = [
     fullName: "SD Negeri 1 Bireuen",
     years: "2013 - 2019",
     photo: "/static/img/SD.jpeg",
+    width: 1315,
+    height: 1375,
     note: "Ganti dengan fotomu semasa SD."
   },
   {
@@ -105,6 +117,8 @@ const EDUCATION = [
     fullName: "SMP Fatih Bilingual School",
     years: "2019 - 2022",
     photo: "/static/img/SMP.jpeg",
+    width: 1440,
+    height: 1440,
     note: "Ganti dengan fotomu semasa SMP."
   },
   {
@@ -112,6 +126,8 @@ const EDUCATION = [
     fullName: "Sekolah Negeri Modal Bangsa",
     years: "2022 - 2025",
     photo: "/static/img/sob.jpg",
+    width: 354,
+    height: 453,
     note: "Ganti dengan fotomu semasa SMA."
   },
 ];

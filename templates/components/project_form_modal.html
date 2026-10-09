@@ -1,21 +1,22 @@
+{# Dipakai untuk tambah dan edit proyek. #}
 <div id="add-project-modal"
      class="project-form-modal"
      popover="auto"
      role="dialog"
-     aria-modal="true"
      aria-labelledby="add-project-modal-title">
     <button type="button"
             class="project-form-modal__backdrop"
             popovertarget="add-project-modal"
             popovertargetaction="hide"
-            aria-label="Tutup form tambah proyek"></button>
+            tabindex="-1"
+            aria-label="Tutup form proyek"></button>
 
     <div class="project-form-modal__content">
         <button type="button"
                 class="project-form-modal__close"
                 popovertarget="add-project-modal"
                 popovertargetaction="hide"
-                aria-label="Tutup form tambah proyek">&times;</button>
+                aria-label="Tutup form proyek">&times;</button>
 
         <h2 id="add-project-modal-title">Tambah Proyek Baru</h2>
         <form id="project-form"
@@ -32,6 +33,8 @@
                     {% endfor %}
                 </div>
             {% endfor %}
+            {# Pesan validasi dari server (diisi lewat JS) #}
+            <div id="project-form-errors" class="form-errors hide" role="alert"></div>
             <div class="project-form-modal__actions">
                 <button type="button"
                         class="button button-secondary"

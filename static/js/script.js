@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
+  initThemeToggle();
+  initModalFocus();
+
   const expMap = document.getElementById("experience-map");
   if (expMap) {
     try {
@@ -86,7 +89,7 @@ function initHobbySlider(container) {
   track.innerHTML = HOBBIES.map(
     (h) => `
     <figure class="slide">
-      <img src="${h.image}" alt="${h.title}" loading="lazy">
+      <img src="${h.image}" alt="${h.title}" width="${h.width}" height="${h.height}" loading="lazy">
       <figcaption>
         <h3>${h.title}</h3>
         <p>${h.caption}</p>
@@ -103,7 +106,12 @@ function initHobbySlider(container) {
 
   function goTo(index) {
     current = (index + HOBBIES.length) % HOBBIES.length;
-    dots.forEach((d, i) => d.classList.toggle("active", i === current));
+    dots.forEach((d, i) => {
+      d.classList.toggle("active", i === current);
+      // Penanda slide aktif untuk pembaca layar
+      if (i === current) d.setAttribute("aria-current", "true");
+      else d.removeAttribute("aria-current");
+    });
     slideEls.forEach((s, i) => {
       s.classList.remove("active", "prev", "next");
       if (i === current) s.classList.add("active");
@@ -140,16 +148,28 @@ function initHobbySlider(container) {
   dots.forEach((d) =>
     d.addEventListener("click", () => {
       goTo(parseInt(d.dataset.index, 10));
-      start(); // reset timer supaya tidak langsung geser lagi setelah diklik manual
+      // Timer tidak dinyalakan lagi di sini: fokus masih di dalam slider,
+      // jadi slide pilihan pengguna tidak langsung tergeser.
     })
   );
 
-  container.addEventListener("mouseenter", stop);
-  container.addEventListener("mouseleave", start);
-  window.addEventListener("resize", debounce(centerActiveSlide, 150));
-
   // hormati preferensi "reduce motion" pengguna
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Slider berhenti saat disorot mouse atau saat fokus keyboard ada di dalamnya,
+  // dan baru jalan lagi setelah keduanya sudah keluar dari slider.
+  function resume(event) {
+    if (prefersReducedMotion) return;
+    const focused = event.type === "focusout" ? event.relatedTarget : document.activeElement;
+    if (container.contains(focused) || container.matches(":hover")) return;
+    start();
+  }
+
+  container.addEventListener("mouseenter", stop);
+  container.addEventListener("mouseleave", resume);
+  container.addEventListener("focusin", stop);
+  container.addEventListener("focusout", resume);
+  window.addEventListener("resize", debounce(centerActiveSlide, 150));
 
   goTo(0);
   if (!prefersReducedMotion) start();
@@ -160,7 +180,7 @@ function renderEducation(container) {
   container.innerHTML = EDUCATION.map(
     (ed) => `
     <figure class="edu-frame">
-      <img src="${ed.photo}" alt="Foto masa ${ed.level}: ${ed.note}" loading="lazy">
+      <img src="${ed.photo}" alt="Foto masa ${ed.level}: ${ed.note}" width="${ed.width}" height="${ed.height}" loading="lazy">
       <figcaption>
         <span class="edu-level">${ed.level}</span>
         <span class="edu-name">${ed.fullName}</span>
@@ -192,4 +212,78 @@ function renderExperienceDetail(container) {
       ${exp.tags.map((t) => `<li>${t}</li>`).join("")}
     </ul>
   `;
+}
+
+/* ---------- Mode gelap/terang ---------- */
+// Tema awal sudah dipasang oleh skrip kecil di <head> (base.html).
+// Di sini tombolnya dihubungkan dan pilihan pengguna disimpan ke localStorage.
+function initThemeToggle() {
+  const toggle = document.getElementById("theme-toggle");
+  if (!toggle) return;
+  const root = document.documentElement;
+  const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+  function storedTheme() {
+    try {
+      return localStorage.getItem("theme");
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function applyTheme(mode) {
+    root.dataset.mode = mode;
+    toggle.setAttribute("aria-pressed", String(mode === "dark"));
+  }
+
+  applyTheme(root.dataset.mode === "dark" ? "dark" : "light");
+
+  toggle.addEventListener("click", () => {
+    const mode = root.dataset.mode === "dark" ? "light" : "dark";
+    applyTheme(mode);
+    try {
+      localStorage.setItem("theme", mode);
+    } catch (err) {
+      // localStorage bisa diblokir; tema tetap berganti untuk halaman ini
+    }
+  });
+
+  // Selama pengguna belum memilih sendiri, ikuti perubahan tema sistem
+  systemDark.addEventListener("change", (event) => {
+    if (!storedTheme()) applyTheme(event.matches ? "dark" : "light");
+  });
+}
+
+/* ---------- Modal (popover): fokus keyboard ---------- */
+// Saat modal dibuka, fokus pindah ke kolom pertama dan Tab berputar di dalam modal.
+// Saat ditutup (termasuk dengan Escape), browser mengembalikan fokus ke tombol pembuka.
+function initModalFocus() {
+  const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled])';
+
+  document.querySelectorAll(".project-form-modal[popover]").forEach((modal) => {
+    const focusableItems = () =>
+      [...modal.querySelectorAll(FOCUSABLE)].filter((el) => el.tabIndex !== -1);
+
+    modal.addEventListener("toggle", (event) => {
+      if (event.newState !== "open") return;
+      const firstField = modal.querySelector("input:not([type='hidden']), select, textarea");
+      if (firstField) firstField.focus();
+    });
+
+    modal.addEventListener("keydown", (event) => {
+      if (event.key !== "Tab") return;
+      const items = focusableItems();
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+  });
 }
