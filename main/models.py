@@ -65,3 +65,43 @@ class Project(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Skill(models.Model):
+    CATEGORY_CHOICES = [
+        ('language', 'Bahasa Pemrograman'),
+        ('framework', 'Framework & Library'),
+        ('tool', 'Tools'),
+        ('other', 'Lainnya'),
+    ]
+    LEVEL_CHOICES = [
+        (1, 'Pemula'),
+        (2, 'Menengah'),
+        (3, 'Mahir'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='language')
+    level = models.PositiveSmallIntegerField(choices=LEVEL_CHOICES, default=1)
+
+    class Meta:
+        ordering = ['category', '-level', 'name']
+
+    def __str__(self):
+        return self.name
+
+
+class Message(models.Model):
+    """Pesan dari form Contact di beranda; dibaca lewat admin."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.TextField(max_length=2000)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.name} <{self.email}>"

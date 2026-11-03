@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.html import strip_tags
 
-from main.models import Experience, Project
+from main.models import Experience, Message, Project
 
 
 class ExperienceForm(forms.ModelForm):
@@ -73,3 +73,35 @@ class ProjectForm(forms.ModelForm):
 
     def clean_description(self):
         return strip_tags(self.cleaned_data["description"]).strip()
+
+
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = [
+            "name",
+            "email",
+            "message",
+        ]
+        labels = {
+            "name": "Nama",
+            "email": "Email",
+            "message": "Pesan",
+        }
+        widgets = {
+            "name": forms.TextInput(attrs={"autocomplete": "name"}),
+            "email": forms.EmailInput(attrs={"autocomplete": "email"}),
+            "message": forms.Textarea(attrs={"rows": 5}),
+        }
+
+    def clean_name(self):
+        name = strip_tags(self.cleaned_data["name"]).strip()
+        if not name:
+            raise ValidationError("Nama tidak boleh hanya berisi tag HTML.")
+        return name
+
+    def clean_message(self):
+        message = strip_tags(self.cleaned_data["message"]).strip()
+        if not message:
+            raise ValidationError("Pesan tidak boleh hanya berisi tag HTML.")
+        return message

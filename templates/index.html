@@ -5,6 +5,9 @@
     {{ name }} - Portofolio
 {% endblock %}
 
+{% block meta_description %}{{ bio }}{% endblock %}
+{% block og_description %}{{ bio }}{% endblock %}
+
 {% block content %}
 
 <!-- ============ PROFIL ============ -->
@@ -57,6 +60,17 @@
                     GitHub
                 </a>
 
+                {# Tombol hanya muncul kalau file CV sudah ditaruh di static/files/ #}
+                {% if cv_url %}
+                    <a
+                        class="btn btn-ghost"
+                        href="{{ cv_url }}"
+                        download
+                    >
+                        Download CV
+                    </a>
+                {% endif %}
+
             </div>
 
         </div>
@@ -66,8 +80,11 @@
 
             <img
                 class="avatar"
-                src="{% static 'img/MuhammadSabri_Staff_DSA.jpg' %}"
-                alt="Photo of {{ name }}"
+                src="{% static 'img/MuhammadSabri_Staff_DSA.webp' %}"
+                alt="Foto {{ name }}"
+                width="960"
+                height="1280"
+                fetchpriority="high"
             >
 
         </figure>
@@ -75,6 +92,48 @@
     </div>
 
 </section>
+
+
+<!-- ============ SKILLS ============ -->
+{# Dikelola lewat admin; section disembunyikan selama belum ada data #}
+{% if skills %}
+<section class="block" id="skills">
+
+    <div class="wrap">
+
+        <div class="block-head">
+
+            <h2>
+                Skills
+            </h2>
+
+        </div>
+
+        {% regroup skills by get_category_display as skill_groups %}
+
+        <div class="skill-grid">
+            {% for group in skill_groups %}
+                <div class="skill-card">
+                    <h3>{{ group.grouper }}</h3>
+                    <ul class="skill-list">
+                        {% for skill in group.list %}
+                            <li>
+                                <span class="skill-name">{{ skill.name }}</span>
+                                <span class="skill-level" data-level="{{ skill.level }}">
+                                    <span class="skill-pips" aria-hidden="true"><i></i><i></i><i></i></span>
+                                    {{ skill.get_level_display }}
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+</section>
+{% endif %}
 
 
 <!-- ============ PENGALAMAN ============ -->
@@ -178,5 +237,117 @@
     </div>
 
 </section>
+
+
+<!-- ============ KONTAK ============ -->
+<section class="block" id="kontak">
+
+    <div class="wrap">
+
+        <div class="block-head">
+
+            <h2>
+                Kontak
+            </h2>
+
+            <p class="block-note">
+                Ada pertanyaan atau ajakan kolaborasi? Kirim pesan di sini.
+            </p>
+
+        </div>
+
+        <form
+            id="contact-form"
+            class="contact-form"
+            method="post"
+            action="{% url 'main:send_message_ajax' %}"
+        >
+            {% csrf_token %}
+
+            {% for field in contact_form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {# Pesan validasi dari server (diisi lewat JS) #}
+                    <p class="form-error hide" id="{{ field.id_for_label }}-error" data-error-for="{{ field.name }}"></p>
+                </div>
+            {% endfor %}
+
+            <div id="contact-form-errors" class="form-errors hide" role="alert"></div>
+
+            <button type="submit" class="button">Kirim pesan</button>
+        </form>
+
+    </div>
+
+</section>
+
+<script>
+    const contactForm = document.getElementById('contact-form');
+    const contactFormErrors = document.getElementById('contact-form-errors');
+
+    // Tampilkan error per field di bawah kolomnya; error lain di kotak umum
+    function showContactErrors(errors = {}, generalMessage = '') {
+        contactForm.querySelectorAll('[data-error-for]').forEach(function (errorElement) {
+            const fieldName = errorElement.dataset.errorFor;
+            const input = contactForm.elements[fieldName];
+            const messages = (errors[fieldName] || []).map(error => error.message);
+
+            // textContent dipakai supaya pesan tidak pernah ditafsirkan sebagai HTML
+            errorElement.textContent = messages.join(' ');
+            errorElement.classList.toggle('hide', messages.length === 0);
+            if (messages.length > 0) {
+                input.setAttribute('aria-invalid', 'true');
+                input.setAttribute('aria-describedby', errorElement.id);
+            } else {
+                input.removeAttribute('aria-invalid');
+                input.removeAttribute('aria-describedby');
+            }
+        });
+
+        contactFormErrors.textContent = generalMessage;
+        contactFormErrors.classList.toggle('hide', !generalMessage);
+    }
+
+    // Kirim pesan dengan Fetch API tanpa reload halaman
+    async function sendMessage(event) {
+        event.preventDefault();
+        const submitButton = contactForm.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+
+        try {
+            const response = await fetch(contactForm.action, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': contactForm.elements['csrfmiddlewaretoken'].value },
+                body: new FormData(contactForm),
+            });
+            const result = await response.json().catch(() => ({}));
+
+            if (response.status === 201) {
+                contactForm.reset();
+                showContactErrors();
+                showToast('Pesan terkirim', result.message || 'Pesan berhasil dikirim.', 'success');
+            } else if (result.errors) {
+                // 400: pesan validasi per field dari ModelForm
+                showContactErrors(result.errors);
+                showToast('Gagal mengirim pesan', 'Periksa kembali isian form.', 'error');
+                const firstInvalid = contactForm.querySelector('[aria-invalid="true"]');
+                if (firstInvalid) firstInvalid.focus();
+            } else {
+                // 429: terlalu sering mengirim; selain itu kesalahan server
+                const message = result.message || `Terjadi kesalahan (status ${response.status}).`;
+                showContactErrors({}, message);
+                showToast('Gagal mengirim pesan', message, 'error');
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            showToast('Gagal mengirim pesan', 'Tidak dapat terhubung ke server. Silakan coba lagi.', 'error');
+        } finally {
+            submitButton.disabled = false;
+        }
+    }
+
+    contactForm.addEventListener('submit', sendMessage);
+</script>
 
 {% endblock %}

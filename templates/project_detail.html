@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {{ project.title }} - {{ name }}
+{% endblock %}
+
+{% block meta_description %}{{ project.description|truncatechars:155 }}{% endblock %}
+{% block og_title %}{{ project.title }} - {{ name }}{% endblock %}
+
+{% block content %}
+
+<section class="detail-section">
+
+    <div class="wrap">
+
+        <a class="back-link" href="{% url 'main:show_projects' %}">
+            &larr; Kembali ke Projects
+        </a>
+
+        <div class="project-detail">
+
+            <article class="project-detail__main">
+
+                <h1>
+                    {{ project.title }}
+                </h1>
+
+                {% if project.project_image_url %}
+                    <img class="project-image" src="{{ project.project_image_url }}" alt="Gambar {{ project.title }}" width="960" height="600">
+                {% endif %}
+
+                <div class="detail-body">
+                    {{ project.description|linebreaks }}
+                </div>
+
+            </article>
+
+            <aside class="project-detail__aside" aria-label="Info proyek">
+
+                <h2>Tech stack</h2>
+                <ul class="tag-list">
+                    {% for tech in tech_list %}
+                        <li>{{ tech }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h2>Tautan</h2>
+                {% if project.project_url %}
+                    <a class="btn btn-ghost button" href="{{ project.project_url }}" target="_blank" rel="noopener noreferrer">
+                        Repo / demo &rarr;<span class="visually-hidden"> (tab baru)</span>
+                    </a>
+                {% else %}
+                    <p class="project-detail__empty">Belum ada tautan untuk proyek ini.</p>
+                {% endif %}
+
+                <h2>Star</h2>
+                {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'main:toggle_star' project.id %}" class="star-form">
+                        {% csrf_token %}
+                        {# Setelah star, kembali ke halaman detail ini #}
+                        <input type="hidden" name="next" value="{{ request.path }}">
+                        <button type="submit" class="button button-star{% if is_starred %} is-starred{% endif %}">
+                            <span aria-hidden="true">★</span> {% if is_starred %}Unstar{% else %}Star{% endif %}
+                            <span class="star-count">{{ star_count }}</span>
+                        </button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'main:login' %}" class="button button-star" title="Login untuk memberi star">
+                        <span aria-hidden="true">★</span> Star
+                        <span class="star-count">{{ star_count }}</span>
+                    </a>
+                {% endif %}
+
+            </aside>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

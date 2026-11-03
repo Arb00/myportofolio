@@ -1,22 +1,22 @@
-{# Memakai ulang gaya .project-form-modal dari Tutorial 05 #}
+{# Memakai ulang gaya .project-form-modal dari Tutorial 05. Dipakai untuk tambah dan edit. #}
 <div id="add-experience-modal"
      class="project-form-modal"
      popover="auto"
      role="dialog"
-     aria-modal="true"
      aria-labelledby="add-experience-modal-title">
     <button type="button"
             class="project-form-modal__backdrop"
             popovertarget="add-experience-modal"
             popovertargetaction="hide"
-            aria-label="Tutup form tambah experience"></button>
+            tabindex="-1"
+            aria-label="Tutup form experience"></button>
 
     <div class="project-form-modal__content">
         <button type="button"
                 class="project-form-modal__close"
                 popovertarget="add-experience-modal"
                 popovertargetaction="hide"
-                aria-label="Tutup form tambah experience">&times;</button>
+                aria-label="Tutup form experience">&times;</button>
 
         <h2 id="add-experience-modal-title">Tambah Experience Baru</h2>
         <form id="experience-form"
@@ -30,6 +30,8 @@
                     {{ field }}
                 </div>
             {% endfor %}
+            {# Pesan validasi dari server (diisi lewat JS) #}
+            <div id="experience-form-errors" class="form-errors hide" role="alert"></div>
             <div class="project-form-modal__actions">
                 <button type="button"
                         class="button button-secondary"

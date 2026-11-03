@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Koin yang sama dengan penanda di samping nama pada header -->
+  <circle cx="16" cy="16" r="12.5" fill="#FFC933" stroke="#23264D" stroke-width="3"/>
+  <path d="M23 9.5a10 10 0 0 1-13.5 13.5a10 10 0 0 0 13.5-13.5z" fill="#23264D" fill-opacity="0.2"/>
+</svg>

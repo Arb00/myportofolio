@@ -17,12 +17,47 @@
 
   /* Status */
   --danger: #B3261E;
+  --on-danger: #FFFFFF;
   --focus: #0F4FC4;
+
+  /* Teks di atas warna aksen, garis putus-putus, placeholder, footer, latar logo */
+  --on-accent: #23264D;
+  --rule: rgba(35, 38, 77, 0.28);
+  --placeholder: #5E6290;
+  --footer-bg: #23264D;
+  --footer-ink: #FFFCF2;
+  --logo-bg: #FFFFFF;
+  --star-hover: #FF9DC0;
+
+  color-scheme: light;
 
   /* Bentuk & huruf */
   --border: 3px solid var(--ink);
   --font-pixel: "Pixelify Sans", "Trebuchet MS", system-ui, sans-serif;
   --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+}
+
+/* Mode gelap: dipasang lewat atribut data-mode pada <html> (lihat base.html) */
+:root[data-mode="dark"] {
+  --sky: #15172E;
+  --sky-dot: #22254A;
+  --bezel: #262A57;
+  --panel: #1F2244;
+  --panel-soft: #2E3268;
+  --field: #14162C;
+  --ink: #F3F1FF;
+  --ink-soft: #C5C8EF;
+
+  --danger: #FF9A8F;
+  --on-danger: #23264D;
+  --focus: #9CC4FF;
+
+  --rule: rgba(243, 241, 255, 0.3);
+  --placeholder: #A9ADD8;
+  --footer-bg: #0E0F22;
+  --footer-ink: #F3F1FF;
+
+  color-scheme: dark;
 }
 
 *,
@@ -36,6 +71,11 @@ html {
 }
 
 body {
+  /* Kolom setinggi layar: footer menempel di bawah walau isi halaman pendek */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   color: var(--ink);
   background-color: var(--sky);
@@ -67,6 +107,7 @@ p:last-child {
 img {
   display: block;
   max-width: 100%;
+  height: auto;
 }
 
 a {
@@ -90,6 +131,29 @@ a {
 
 .hide {
   display: none !important;
+}
+
+/* Hanya untuk pembaca layar */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Target skip-link: fokus berpindah tanpa garis fokus di seluruh halaman */
+main:focus {
+  outline: none;
+}
+
+/* Isi halaman mengisi sisa tinggi layar sehingga footer terdorong ke bawah */
+main {
+  flex: 1 0 auto;
 }
 
 .skip-link {
@@ -201,6 +265,41 @@ a {
   background: var(--panel-soft);
 }
 
+/* Tombol mode gelap/terang */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.4rem 0.9rem;
+  font-family: var(--font-pixel);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--panel);
+  border: 3px solid var(--ink);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+/* Kotak kecil sebagai penanda aktif, supaya tidak hanya bergantung pada warna */
+.theme-toggle::before {
+  content: "";
+  flex: none;
+  width: 14px;
+  height: 14px;
+  background: var(--panel);
+  border: 3px solid var(--ink);
+}
+
+.theme-toggle[aria-pressed="true"]::before {
+  background: var(--coin);
+}
+
+.theme-toggle:hover {
+  background: var(--panel-soft);
+}
+
 /* ==========================================================================
    TOMBOL — satu-satunya elemen yang bergerak: menekan ke bawah saat diklik
    ========================================================================== */
@@ -271,7 +370,7 @@ a {
 }
 
 .button-star.is-starred:hover {
-  background: #FF9DC0;
+  background: var(--star-hover);
 }
 
 .star-form {
@@ -305,7 +404,7 @@ a {
 }
 
 .delete-button:hover {
-  color: #fff;
+  color: var(--on-danger);
   background: var(--danger);
   transform: translate(-2px, -2px);
   box-shadow: 5px 5px 0 var(--danger);
@@ -318,7 +417,7 @@ a {
 
 .delete-button--confirm,
 .delete-button--confirm:hover {
-  color: #fff;
+  color: var(--on-danger);
   background: var(--danger);
 }
 
@@ -327,7 +426,7 @@ a {
    ========================================================================== */
 .hero {
   padding: clamp(2.5rem, 6vw, 4.5rem) 0;
-  border-bottom: 3px dashed rgba(35, 38, 77, 0.28);
+  border-bottom: 3px dashed var(--rule);
 }
 
 .hero .wrap {
@@ -445,7 +544,7 @@ a {
    ========================================================================== */
 section.block {
   padding: clamp(3rem, 7vw, 5rem) 0;
-  border-bottom: 3px dashed rgba(35, 38, 77, 0.28);
+  border-bottom: 3px dashed var(--rule);
 }
 
 .block-head {
@@ -826,7 +925,7 @@ a.experience-card:hover {
   height: 44px;
   padding: 4px;
   object-fit: contain;
-  background: var(--field);
+  background: var(--logo-bg);
   border: 3px solid var(--ink);
 }
 
@@ -1071,7 +1170,7 @@ a.experience-card:hover {
   margin-bottom: 1.25rem;
   padding: 6px;
   object-fit: contain;
-  background: var(--field);
+  background: var(--logo-bg);
   border: var(--border);
 }
 
@@ -1182,7 +1281,7 @@ a.experience-card:hover {
   margin-top: 0.15rem;
   font-family: var(--font-pixel);
   font-size: 0.9rem;
-  color: #fff;
+  color: var(--on-danger);
   background: var(--danger);
 }
 
@@ -1194,7 +1293,7 @@ a.experience-card:hover {
 }
 
 /* Kolom isian */
-:is(.experience-form, .project-form, .experience-search, .project-search)
+:is(.experience-form, .project-form, .contact-form, .experience-search, .project-search)
   :is(input:not([type="checkbox"], [type="radio"]), select, textarea) {
   width: 100%;
   min-height: 46px;
@@ -1207,21 +1306,44 @@ a.experience-card:hover {
   box-shadow: inset 3px 3px 0 rgba(35, 38, 77, 0.1);
 }
 
-:is(.experience-form, .project-form) textarea {
+:is(.experience-form, .project-form, .contact-form) textarea {
   min-height: 7rem;
   resize: vertical;
 }
 
-:is(.experience-form, .project-form, .experience-search, .project-search)
+:is(.experience-form, .project-form, .contact-form, .experience-search, .project-search)
   :is(input, select, textarea):focus {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
 }
 
-:is(.experience-form, .project-form, .experience-search, .project-search)
+:is(.experience-form, .project-form, .contact-form, .experience-search, .project-search)
   :is(input, textarea)::placeholder {
-  color: #5E6290;
+  color: var(--placeholder);
   opacity: 1;
+}
+
+/* Kolom yang ditolak server ditandai garis merah, selain pesan teksnya */
+:is(.experience-form, .project-form, .contact-form) [aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+/* Kotak pesan validasi dari server (diisi lewat JS) */
+.form-errors {
+  margin-top: 1rem;
+  padding: 0.7rem 0.9rem;
+  font-weight: 700;
+  color: var(--danger);
+  background: var(--panel);
+  border: 3px solid var(--danger);
+}
+
+.form-errors .form-error {
+  margin: 0;
+}
+
+.form-errors .form-error + .form-error {
+  margin-top: 0.4rem;
 }
 
 /* ==========================================================================
@@ -1400,17 +1522,273 @@ a.experience-card:hover {
    ========================================================================== */
 .site-footer {
   padding: 1.75rem 0;
-  color: var(--panel);
-  background: var(--ink);
+  color: var(--footer-ink);
+  background: var(--footer-bg);
   border-top: 6px solid var(--coin);
 }
 
 .site-footer .wrap {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   font-size: 0.95rem;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1.25rem;
+}
+
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-pixel);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--coin);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+}
+
+.footer-links a:hover {
+  color: var(--coin);
+}
+
+/* Di atas footer yang gelap, garis fokus biru tua tidak terlihat */
+.site-footer :focus-visible {
+  outline-color: var(--coin);
+}
+
+/* ==========================================================================
+   MUAT LEBIH BANYAK
+   ========================================================================== */
+.load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 2.25rem;
+}
+
+/* ==========================================================================
+   DETAIL PROYEK — <article> untuk isi, <aside> untuk info samping
+   ========================================================================== */
+.project-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18rem;
+  align-items: start;
+  gap: 2.5rem;
+}
+
+.project-detail__main h1 {
+  max-width: none;
+  margin: 0.4rem 0 1.5rem;
+}
+
+.project-detail__main .project-image {
+  margin-bottom: 1.75rem;
+}
+
+.project-detail__main .detail-body {
+  max-width: none;
+}
+
+.project-detail__aside {
+  padding: 1.25rem 1.3rem 1.4rem;
+  background: var(--panel);
+  border: var(--border);
+  box-shadow: 6px 6px 0 var(--blue), 6px 6px 0 3px var(--ink);
+}
+
+.project-detail__aside h2 {
+  margin: 1.5rem 0 0.7rem;
+  font-size: 1.2rem;
+}
+
+.project-detail__aside h2:first-child {
+  margin-top: 0;
+}
+
+.project-detail__empty {
+  color: var(--ink-soft);
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tag-list li {
+  padding: 0.15rem 0.7rem;
+  font-family: var(--font-pixel);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--on-accent);
+  background: var(--mint);
+  border: 3px solid var(--ink);
+}
+
+/* Judul kartu proyek mengarah ke halaman detail */
+.project-title-link {
+  text-decoration: underline;
+  text-decoration-color: var(--accent, var(--blue));
+  text-decoration-thickness: 3px;
+  text-underline-offset: 4px;
+}
+
+.project-title-link:hover {
+  background: var(--panel-soft);
+}
+
+/* ==========================================================================
+   BERANDA — SKILLS & KONTAK
+   ========================================================================== */
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 2rem 1.75rem;
+}
+
+.skill-card {
+  padding: 1.2rem 1.3rem 1.3rem;
+  background: var(--panel);
+  border: var(--border);
+  box-shadow: 6px 6px 0 var(--accent, var(--blue)), 6px 6px 0 3px var(--ink);
+}
+
+.skill-card:nth-child(4n + 2) {
+  --accent: var(--pink);
+}
+
+.skill-card:nth-child(4n + 3) {
+  --accent: var(--mint);
+}
+
+.skill-card:nth-child(4n + 4) {
+  --accent: var(--coin);
+}
+
+.skill-card h3 {
+  margin-bottom: 0.9rem;
+  font-size: 1.3rem;
+}
+
+.skill-list {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.skill-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.2rem 1rem;
+}
+
+.skill-name {
+  font-weight: 700;
+}
+
+.skill-level {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+/* Tiga kotak: terisi sesuai level (teks level tetap ditulis di sampingnya) */
+.skill-pips {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.skill-pips i {
+  width: 12px;
+  height: 12px;
+  background: var(--panel);
+  border: 2px solid var(--ink);
+}
+
+.skill-level[data-level="1"] .skill-pips i:nth-child(-n + 1),
+.skill-level[data-level="2"] .skill-pips i:nth-child(-n + 2),
+.skill-level[data-level="3"] .skill-pips i:nth-child(-n + 3) {
+  background: var(--accent, var(--blue));
+}
+
+.contact-form {
+  max-width: 40rem;
+  padding: 1.5rem;
+  background: var(--panel);
+  border: var(--border);
+  box-shadow: 8px 8px 0 var(--mint), 8px 8px 0 3px var(--ink);
+}
+
+.contact-form .button {
+  margin-top: 0.5rem;
+}
+
+/* ==========================================================================
+   TEKS DI ATAS WARNA AKSEN
+   Aksen (kuning, pink, mint, biru) sama di mode terang dan gelap,
+   jadi teks di atasnya selalu memakai warna gelap --on-accent.
+   ========================================================================== */
+.skip-link,
+.site-nav a[aria-current="page"],
+.site-nav .nav-user,
+.btn,
+.button,
+.hero-eyebrow,
+.meta-row dt,
+.hero-photo::before,
+.edu-frame::before,
+.experience-category,
+.education-level,
+.exp-icon,
+.message,
+.form-message,
+.back-link:hover,
+.form-wrap p a:hover,
+:is(
+    .experience-delete-modal__close,
+    .project-delete-modal__close,
+    .project-form-modal__close
+  ):hover {
+  color: var(--on-accent);
+}
+
+::selection {
+  color: var(--on-accent);
+}
+
+/* Tombol berlatar panel tetap memakai warna teks biasa */
+.btn-ghost,
+.button-secondary,
+.button-star {
+  color: var(--ink);
+}
+
+.button-star.is-starred {
+  color: var(--on-accent);
+}
+
+.delete-button {
+  color: var(--danger);
+}
+
+.delete-button:hover {
+  color: var(--on-danger);
 }
 
 /* ==========================================================================
@@ -1424,6 +1802,10 @@ a.experience-card:hover {
 
 @media (max-width: 780px) {
   .hero .wrap {
+    grid-template-columns: 1fr;
+  }
+
+  .project-detail {
     grid-template-columns: 1fr;
   }
 
