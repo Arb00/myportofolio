@@ -71,6 +71,11 @@ html {
 }
 
 body {
+  /* Kolom setinggi layar: footer menempel di bawah walau isi halaman pendek */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   color: var(--ink);
   background-color: var(--sky);
@@ -144,6 +149,11 @@ a {
 /* Target skip-link: fokus berpindah tanpa garis fokus di seluruh halaman */
 main:focus {
   outline: none;
+}
+
+/* Isi halaman mengisi sisa tinggi layar sehingga footer terdorong ke bawah */
+main {
+  flex: 1 0 auto;
 }
 
 .skip-link {

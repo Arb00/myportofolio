@@ -427,11 +427,11 @@ class ProjectTest(TestCase):
         self.assertEqual(str(self.project), "Fern AI Assistant")
 
     def test_show_projects_view(self):
-        """Halaman hanya merender kerangka; daftar diambil lewat fetch() ke endpoint JSON."""
+        """Halaman hanya merender kerangka; daftar diambil lewat fetch() ke API DRF."""
         response = self.client.get(reverse("main:show_projects"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "project.html")
-        self.assertContains(response, reverse("main:get_projects_json"))
+        self.assertContains(response, reverse("api:project-list"))
         self.assertNotContains(response, self.project.title)
 
     def test_show_projects_filter(self):
@@ -453,13 +453,17 @@ class ProjectTest(TestCase):
         self.assertContains(response, "Belum ada proyek yang ditambahkan atau ditemukan.")
         self.assertEqual(self.client.get(reverse("main:get_projects_json")).json(), [])
 
-    def test_add_button_only_shown_with_permission(self):
+    def test_add_button_only_shown_to_owner(self):
+        """Sejak Tutorial 07, Projects hanya dikelola pemilik (superuser), sama dengan API."""
         add_button = 'id="add-project-button"'
         url = reverse("main:show_projects")
 
         self.assertNotContains(self.client.get(url), add_button)
 
         self.client.force_login(create_user_with_perms("editor", "add_project"))
+        self.assertNotContains(self.client.get(url), add_button)
+
+        self.client.force_login(User.objects.create_superuser("owner", password=PASSWORD))
         self.assertContains(self.client.get(url), add_button)
 
     def test_create_project_requires_login_and_permission(self):
